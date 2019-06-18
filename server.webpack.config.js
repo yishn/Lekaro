@@ -1,10 +1,10 @@
 const path = require('path')
 
 module.exports = (env, argv) => ({
-  entry: './service/main.js',
+  entry: './server/main.js',
 
   output: {
-    filename: 'service.js',
+    filename: 'server.js',
     path: path.join(__dirname, 'build')
   },
 

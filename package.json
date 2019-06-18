@@ -2,15 +2,15 @@
   "name": "lekaro",
   "version": "1.0.0",
   "description": "A modern UI for displaying weather forecasts",
-  "module": "./main/service.js",
+  "module": "./server/main.js",
   "scripts": {
     "build-ui": "webpack --config ./ui.webpack.config.js --mode production --progress",
     "watch-ui": "webpack --config ./ui.webpack.config.js --mode development --progress --watch",
-    "build-service": "webpack --config ./service.webpack.config.js --mode production --progress",
-    "watch-service": "webpack --config ./service.webpack.config.js --mode development --progress --watch",
-    "build": "npm-run-all -p build-ui build-service",
-    "watch": "npm-run-all -p watch-ui watch-service",
-    "start": "node ./build/service.js",
+    "build-server": "webpack --config ./server.webpack.config.js --mode production --progress",
+    "watch-server": "webpack --config ./server.webpack.config.js --mode development --progress --watch",
+    "build": "npm-run-all -p build-ui build-server",
+    "watch": "npm-run-all -p watch-ui watch-server",
+    "start": "node ./build/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
