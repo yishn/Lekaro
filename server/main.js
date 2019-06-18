@@ -17,7 +17,8 @@ function route(func) {
         res.send(result)
       }
     } catch (err) {
-      res.status(500).type('text/plain').send(err.stack)
+      console.log('error:', err.stack)
+      res.status(500).type('text/plain').send(err.message)
     }
   }
 }
@@ -39,5 +40,5 @@ app.get('/forecast', route(async (req, res) => {
 }))
 
 app.listen(config.port, () => {
-  console.log(`Lekaro listening on port ${config.port}`)
+  console.log(`info: Lekaro listening on port ${config.port}`)
 })

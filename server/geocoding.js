@@ -3,6 +3,8 @@ import request from 'request'
 let cache = {}
 
 async function nominatimRequest(path, options = {}) {
+  console.log('info: Request Nominatim', path, options)
+
   return await new Promise((resolve, reject) => {
     request({
       url: path,

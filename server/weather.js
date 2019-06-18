@@ -2,6 +2,8 @@ import request from 'request'
 import config from '../config.js'
 
 async function darkSkyRequest(path, options = {}) {
+  console.log('info: Request Dark Sky', path, options)
+
   return await new Promise((resolve, reject) => {
     request({
       url: path,
