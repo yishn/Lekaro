@@ -9,5 +9,17 @@ module.exports = (env, argv) => ({
   },
 
   devtool: argv.mode === 'production' ? false : 'cheap-module-eval-source-map',
-  target: 'web'
+  target: 'web',
+
+  module: {
+    rules: [{
+      test: /\.js$/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: [['@babel/preset-react', {pragma: 'h'}]]
+        }
+      }
+    }]
+  }
 })
