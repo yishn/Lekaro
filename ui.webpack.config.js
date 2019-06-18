@@ -5,7 +5,7 @@ module.exports = (env, argv) => ({
 
   output: {
     filename: 'bundle.js',
-    path: path.join(__dirname, 'dist')
+    path: path.join(__dirname, 'static')
   },
 
   devtool: argv.mode === 'production' ? false : 'cheap-module-eval-source-map',
@@ -17,7 +17,8 @@ module.exports = (env, argv) => ({
       use: {
         loader: 'babel-loader',
         options: {
-          presets: [['@babel/preset-react', {pragma: 'h'}]]
+          presets: [['@babel/preset-react', {pragma: 'h'}]],
+          plugins: [['@babel/plugin-proposal-class-properties', {loose: true}]]
         }
       }
     }]

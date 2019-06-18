@@ -2,6 +2,7 @@
   "name": "lekaro",
   "version": "1.0.0",
   "description": "A modern UI for displaying weather forecasts",
+  "module": "./main/service.js",
   "scripts": {
     "build-ui": "webpack --config ./ui.webpack.config.js --mode production --progress",
     "watch-ui": "webpack --config ./ui.webpack.config.js --mode development --progress --watch",
@@ -9,6 +10,7 @@
     "watch-service": "webpack --config ./service.webpack.config.js --mode development --progress --watch",
     "build": "npm-run-all -p build-ui build-service",
     "watch": "npm-run-all -p watch-ui watch-service",
+    "start": "node ./build/service.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -35,9 +37,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.6",
-    "http-server": "^0.11.1",
     "npm-run-all": "^4.1.5",
     "webpack": "^4.34.0",
     "webpack-cli": "^3.3.4"

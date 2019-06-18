@@ -1,5 +1,6 @@
 config.js
-dist/
+build/
+static/bundle.js
 
 # Logs
 logs

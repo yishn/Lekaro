@@ -5,9 +5,17 @@ module.exports = (env, argv) => ({
 
   output: {
     filename: 'service.js',
-    path: path.join(__dirname, 'dist')
+    path: path.join(__dirname, 'build')
   },
 
   devtool: argv.mode === 'production' ? false : 'cheap-module-eval-source-map',
-  target: 'node'
+  target: 'node',
+
+  node: {
+    __dirname: false
+  },
+
+  externals: {
+    express: 'require("express")'
+  }
 })
