@@ -26,18 +26,33 @@ async function nominatimRequest(path, options = {}) {
   })
 }
 
+function transformNominatimResponse(response) {
+  return {
+    license: response.licence,
+    location: [response.lon, response.lat],
+    type: response.type,
+
+    address: {
+      country: response.address.country,
+      state: response.address.state
+        || response.address.county
+        || response.address.region,
+      city: response.address.city
+        || response.address.island
+        || response.address.town
+        || response.address.village
+    }
+  }
+}
+
 export async function search(query, options = {}) {
   let response = await nominatimRequest('/search', {
     ...options,
-    q: query
+    q: query,
+    addressdetails: 1
   })
 
-  let result = response.map(entry => ({
-    license: entry.licence,
-    location: [entry.lon, entry.lat],
-    text: entry.display_name,
-    type: entry.type
-  }))
+  let result = response.map(transformNominatimResponse)
 
   return result
 }
@@ -55,21 +70,19 @@ export async function reverse([lon, lat], options = {}) {
       lon,
       lat,
       osm_type: 'N',
+      addressdetails: 1,
       zoom: 10
     })
 
-    return {
-      license: response.licence,
-      location: [lon, lat],
-      text: response.display_name,
-      type: response.type
-    }
+    return transformNominatimResponse(response)
   } catch (err) {}
 
   return {
     license: '',
     location: [lon, lat],
-    text: 'Middle of Nowhere',
-    type: 'nowhere'
+    type: 'nowhere',
+    address: {
+      city: 'Middle of Nowhere'
+    }
   }
 }
