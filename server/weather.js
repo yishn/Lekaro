@@ -14,7 +14,7 @@ async function darkSkyRequest(path, options = {}) {
     }, (err, response, body) => {
       err != null ? reject(err)
       : response.statusCode < 200 || response.statusCode >= 300 ? reject(new Error(body.error))
-      : resolve(body)
+      : resolve({license: 'Powered by Dark Sky', ...body})
     })
   })
 }

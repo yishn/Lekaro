@@ -24,14 +24,22 @@ function route(func) {
 }
 
 app.get('/forecast', route(async (req, res) => {
-  let {name} = req.query
-  let info = await geocoding.get(name)
+  let {name, lon, lat, units} = req.query
+  let info = {location: [lon, lat]}
 
-  if (info == null) {
-    throw new Error('No location found by given name')
+  if (lon == null || lat == null) {
+    info = await geocoding.get(name)
+
+    if (info == null) {
+      throw new Error('No location found by given name')
+    }
+  } else {
+    try {
+      info = await geocoding.reverse([lon, lat])
+    } catch (err) {}
   }
 
-  let forecast = await weather.getForecast(info.location, {extend: 'hourly'})
+  let forecast = await weather.getForecast(info.location, {extend: 'hourly', units})
 
   return {
     info,
