@@ -37,7 +37,7 @@ app.get('/forecast', route(async (req, res) => {
     info = await geocoding.reverse([lon, lat])
   }
 
-  let forecast = await weather.getForecast(info.location, {extend: 'hourly', units})
+  let forecast = await weather.getForecast(info.location, {units})
 
   return {
     info,

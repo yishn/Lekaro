@@ -53,7 +53,9 @@ export async function reverse([lon, lat], options = {}) {
     let response = await nominatimRequest('/reverse', {
       ...options,
       lon,
-      lat
+      lat,
+      osm_type: 'N',
+      zoom: 10
     })
 
     return {

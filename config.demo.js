@@ -1,4 +1,4 @@
 export default {
-  apiKey: 'abcd',
+  darkSkyApiKey: 'abcd',
   port: 13442
 }
