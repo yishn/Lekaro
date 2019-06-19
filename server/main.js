@@ -34,9 +34,7 @@ app.get('/forecast', route(async (req, res) => {
       throw new Error('No location found by given name')
     }
   } else {
-    try {
-      info = await geocoding.reverse([lon, lat])
-    } catch (err) {}
+    info = await geocoding.reverse([lon, lat])
   }
 
   let forecast = await weather.getForecast(info.location, {extend: 'hourly', units})

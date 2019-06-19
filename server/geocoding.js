@@ -18,6 +18,7 @@ async function nominatimRequest(path, options = {}) {
     }, (err, response, body) => {
       if (err != null) return reject(err)
       if (response.statusCode < 200 || response.statusCode >= 300) return reject(new Error('Response not OK'))
+      if (body.error != null) return reject(new Error(body.error))
 
       cache[key] = body
       resolve(body)
@@ -48,16 +49,25 @@ export async function get(query, options = {}) {
 }
 
 export async function reverse([lon, lat], options = {}) {
-  let response = await nominatimRequest('/reverse', {
-    ...options,
-    lon,
-    lat
-  })
+  try {
+    let response = await nominatimRequest('/reverse', {
+      ...options,
+      lon,
+      lat
+    })
+
+    return {
+      license: response.licence,
+      location: [lon, lat],
+      text: response.display_name,
+      type: response.type
+    }
+  } catch (err) {}
 
   return {
-    license: response.licence,
+    license: '',
     location: [lon, lat],
-    text: response.display_name,
-    type: response.type
+    text: 'Middle of Nowhere',
+    type: 'nowhere'
   }
 }
