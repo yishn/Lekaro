@@ -24,8 +24,6 @@ export function getMonotoneCubicInterpolation(xs, ys) {
     : (ys[i + 1] - ys[i - 1]) / (xs[i + 1] - xs[i - 1])
   )
 
-  console.log(slopes)
-
   let splines = slopes.map((m, i) =>
     i === 0 ? null
     : createSpline(xs[i - 1], ys[i - 1], xs[i], ys[i], slopes[i - 1], m)
