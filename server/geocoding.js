@@ -33,14 +33,18 @@ function transformNominatimResponse(response) {
     type: response.type,
 
     address: {
-      country: response.address.country,
+      country: response.address.country
+        || response.address.continent,
       state: response.address.state
-        || response.address.county
-        || response.address.region,
+        || response.address.state_district,
       city: response.address.city
-        || response.address.island
         || response.address.town
         || response.address.village
+        || response.address.city_district
+        || response.address.county
+        || response.address.region
+        || response.address.island
+        || response.address.administrative
     }
   }
 }
