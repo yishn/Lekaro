@@ -29,7 +29,7 @@ async function nominatimRequest(path, options = {}) {
 function transformNominatimResponse(response) {
   return {
     license: response.licence,
-    location: [response.lon, response.lat],
+    coordinates: [response.lon, response.lat],
     type: response.type,
 
     address: {
@@ -79,7 +79,7 @@ export async function reverse([lon, lat], options = {}) {
 
   return {
     license: '',
-    location: [lon, lat],
+    coordinates: [lon, lat],
     type: 'nowhere',
     address: {
       city: 'Middle of Nowhere'

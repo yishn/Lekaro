@@ -25,7 +25,7 @@ function route(func) {
 
 app.get('/forecast', route(async (req, res) => {
   let {name, lon, lat, units} = req.query
-  let info = {location: [lon, lat]}
+  let info = {coordinates: [lon, lat]}
 
   if (lon == null || lat == null) {
     info = await geocoding.get(name)
@@ -37,7 +37,7 @@ app.get('/forecast', route(async (req, res) => {
     info = await geocoding.reverse([lon, lat])
   }
 
-  let forecast = await weather.getForecast(info.location, {units})
+  let forecast = await weather.getForecast(info.coordinates, {units})
 
   return {
     info,
