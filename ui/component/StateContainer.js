@@ -17,6 +17,8 @@ export default class StateContainer extends Component {
   loadForecast = async name => {
     let url
 
+    this.setState({loading: true})
+
     if (name == null) {
       // Get current location
 
@@ -31,20 +33,23 @@ export default class StateContainer extends Component {
       url = `/forecast?name=${encodeURIComponent(name)}`
     }
 
-    let response = await fetch(`${url}&units=${encodeURIComponent(this.state.units)}`)
+    try {
+      let response = await fetch(`${url}&units=${encodeURIComponent(this.state.units)}`)
+      if (!response.ok) throw new Error()
 
-    if (!response.ok) {
-      return this.setState({
+      let {info, forecast} = await response.json()
+
+      this.setState({
+        loading: false,
+        locationInfo: info,
+        forecastData: forecast
+      })
+    } catch (err) {
+      this.setState({
+        loading: false,
         error: true
       })
     }
-
-    let {info, forecast} = await response.json()
-
-    this.setState({
-      locationInfo: info,
-      forecastData: forecast
-    })
   }
 
   render() {

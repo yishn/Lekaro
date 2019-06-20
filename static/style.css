@@ -3,8 +3,77 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 body {
+  --accent-color-1: #F6E3AB;
+  --accent-color-2: #B43F5A;
+  --accent-color-3: #4B1D37;
+  --accent-color-4: #70575B;
+  --accent-color-5: #869B88;
+
   font: 100%/1.5 'Raleway', sans-serif;
+  color: #333;
+}
+
+h1 {
+  position: absolute;
+  left: -9999rem;
+  top: -9999rem;
+}
+
+svg {
+  fill: currentColor;
+}
+
+a {
+  color: var(--accent-color-2);
+}
+
+@keyframes loading {
+  0% { border-color: var(--accent-color-1) }
+  20% { border-color: var(--accent-color-2) }
+  40% { border-color: var(--accent-color-3) }
+  60% { border-color: var(--accent-color-4) }
+  80% { border-color: var(--accent-color-5) }
+  100% { border-color: var(--accent-color-1) }
+}
+
+.location-info {
+    position: relative;
+    padding: 1.5rem 3rem;
+    border-top: 5px solid transparent;
+  }
+  .location-info.loading {
+    animation: loading 1s linear infinite;
+  }
+  .location-info h2 {
+    font-size: 2.5rem;
+    font-weight: normal;
+  }
+  .location-info h2 input {
+    width: calc(100% + .5rem);
+    margin-left: -.5rem;
+    padding: 0 .5rem;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+  .location-info h2 input:focus {
+    outline: none;
+    background: #eee;
+  }
+  .location-info h2 input:disabled {
+    background: transparent;
+  }
+  .location-info h3 {
+    font-size: 1.3rem;
+    font-weight: normal;
+  }
+  .location-info .currentlocation svg {
+    width: 1rem;
+    height: 1rem;
+    margin-right: .5rem;
 }
