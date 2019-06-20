@@ -12,15 +12,27 @@ module.exports = (env, argv) => ({
   target: 'web',
 
   module: {
-    rules: [{
-      test: /\.js$/,
-      use: {
-        loader: 'babel-loader',
-        options: {
-          presets: [['@babel/preset-react', {pragma: 'h'}]],
-          plugins: [['@babel/plugin-proposal-class-properties', {loose: true}]]
+    rules: [
+      {
+        test: /\.js$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [['@babel/preset-react', {pragma: 'h'}]],
+            plugins: [['@babel/plugin-proposal-class-properties', {loose: true}]]
+          }
         }
+      },
+      {
+        test: /\.svg$/,
+        loader: 'react-svg-loader'
       }
-    }]
+    ]
+  },
+
+  resolve: {
+    alias: {
+      react: 'preact'
+    }
   }
 })
