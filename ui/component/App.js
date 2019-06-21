@@ -66,7 +66,15 @@ export default class App extends Component {
 
       <WeatherTimeline
         labels={hourLabels}
-        cloudCover={forecastData.hourly && forecastData.hourly.map(entry => entry.cloudCover)}
+        cloudCover={
+          forecastData.hourly && forecastData.hourly.map(entry => entry.cloudCover)
+        }
+        temperature={
+          forecastData.hourly && forecastData.hourly.map(entry => entry.temperature)
+        }
+        apparentTemperature={
+          forecastData.hourly && forecastData.hourly.map(entry => entry.apparentTemperature)
+        }
       />
     </div>
   }

@@ -12,6 +12,8 @@ body {
   --accent-color-3: #4B1D37;
   --accent-color-4: #70575B;
   --accent-color-5: #869B88;
+  --accent-color-6: #DB4F08;
+  --accent-color-6-40: #F0B89D;
 
   font: 100%/1.5 Oxygen, sans-serif;
   color: #333;
@@ -89,8 +91,34 @@ a {
 }
 
 .weather-timeline {
-  padding: 1rem .5rem;
-  overflow: auto;
+    padding: 1rem .5rem;
+    overflow: auto;
+  }
+  .weather-timeline .graph {
+    position: relative;
+  }
+  .weather-timeline .graph svg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.temperature-graph .helperlines line {
+    stroke: #ddd;
+  }
+  .temperature-graph path {
+    stroke: var(--accent-color-6);
+  }
+  .temperature-graph path.apparent {
+    stroke: var(--accent-color-6-40);
+  }
+  .temperature-graph circle {
+    fill: var(--accent-color-6);
+  }
+  .temperature-graph circle.apparent {
+    fill: var(--accent-color-6-40);
 }
 
 .labeled-ticks {
