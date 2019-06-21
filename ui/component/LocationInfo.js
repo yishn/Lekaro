@@ -67,20 +67,22 @@ export default class LocationInfo extends Component {
   }
 
   render() {
-    let {loading, city, state, country} = this.props
+    let {loading, state, country} = this.props
 
     return <div class={classnames('location-info', {loading})}>
       <h2>
         <input
           disabled={loading}
           value={this.state.input}
+          placeholder="Location"
 
           onInput={this.handleInputInput}
           onKeyDown={this.handleInputKeyDown}
           onBlur={this.handleInputBlur}
         />
       </h2>
-      <h3>
+
+      <div class="toolbar">
         <a
           class="currentlocation"
           href="#"
@@ -88,10 +90,10 @@ export default class LocationInfo extends Component {
           onClick={this.handleCurrentLocationClick}
         >
           <CurrentLocationIcon viewBox="0 0 24 24"/>
-        </a>
+        </a>{' '}
 
-        {' ' + [state, country].filter(x => !!x).join(', ')}
-      </h3>
+        <h3>{([state, country].filter(x => !!x).join(', ') || 'Unknown')}</h3>
+      </div>
     </div>
   }
 }

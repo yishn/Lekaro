@@ -14,30 +14,44 @@ export default class StateContainer extends Component {
     }
   }
 
-  loadForecast = async name => {
-    let url
+  loadForecastFromURL = (options = {}) => {
+    let {hash} = window.location
 
+    if (hash != null && hash.length > 1) {
+      let coordinates = hash.slice(1).split(',')
+      this.loadForecast({coordinates, ...options})
+    } else {
+      this.loadForecast(options)
+    }
+  }
+
+  loadForecast = async ({name, coordinates, pushHistory = true} = {}) => {
     this.setState({loading: true})
 
-    if (name == null) {
+    if (name == null && coordinates == null) {
       // Get current location
 
       try {
-        let [lon, lat] = await getCurrentCoordinates()
-
-        url = `/forecast?lon=${lon}&lat=${lat}`
+        coordinates = await getCurrentCoordinates()
       } catch (err) {
-        url = `/forecast?name=Heidelberg`
+        name = 'Heidelberg'
       }
-    } else {
-      url = `/forecast?name=${encodeURIComponent(name)}`
     }
 
+    let enc = encodeURIComponent
+    let url = name != null
+      ? `/forecast?name=${enc(name)}`
+      : `/forecast?lon=${enc(coordinates[0])}&lat=${enc(coordinates[1])}`
+
     try {
-      let response = await fetch(`${url}&units=${encodeURIComponent(this.state.units)}`)
+      let response = await fetch(`${url}&units=${enc(this.state.units)}`)
       if (!response.ok) throw new Error()
 
       let {info, forecast} = await response.json()
+
+      if (pushHistory) {
+        history.pushState(null, '', `#${info.coordinates.join(',')}`)
+      }
 
       this.setState({
         loading: false,

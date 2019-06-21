@@ -2,12 +2,34 @@ import {h, Component} from 'preact'
 import LocationInfo from './LocationInfo';
 
 export default class App extends Component {
+  get title() {
+    let {city, state, country} = this.props.locationInfo.address || {}
+    let result = `${[city, state, country].filter(x => !!x).join(', ')}`
+
+    if (result.trim() !== '') result += ' - '
+    result += 'Lekaro Weather'
+
+    return result
+  }
+
   componentDidMount() {
-    this.actions.loadForecast()
+    // Load forecast
+
+    this.actions.loadForecastFromURL()
+
+    // Handle events
+
+    window.addEventListener('popstate', () => {
+      this.actions.loadForecastFromURL({pushHistory: false})
+    })
+  }
+
+  componentDidUpdate() {
+    document.title = this.title
   }
 
   handleSearch = evt => {
-    this.actions.loadForecast(evt.value)
+    this.actions.loadForecast({name: evt.value})
   }
 
   handleCurrentLocationClick = () => {
