@@ -44,7 +44,7 @@ export default class StateContainer extends Component {
       : `/forecast?lon=${enc(coordinates[0])}&lat=${enc(coordinates[1])}`
 
     try {
-      let response = await fetch(`${url}&units=${enc(this.state.units)}`)
+      let response = await fetch(`${url}&units=${enc(this.state.units)}&language=en-US`)
       if (!response.ok) throw new Error()
 
       let {info, forecast} = await response.json()

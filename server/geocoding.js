@@ -12,7 +12,10 @@ async function nominatimRequest(path, options = {}) {
     request({
       url: path,
       baseUrl: `https://nominatim.openstreetmap.org/`,
-      headers: {'User-Agent': 'Lekaro'},
+      headers: {
+        'User-Agent': 'Lekaro',
+        'Accept-Language': options.language
+      },
       qs: {...options, format: 'jsonv2'},
       json: true
     }, (err, response, body) => {
