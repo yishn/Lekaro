@@ -77,7 +77,6 @@ export async function search(query, options = {}) {
       acc.push(entry)
       return acc
     }, [])
-    .sort((x, y) => x.place_rank - y.place_rank)
     .map(transformNominatimResponse)
 }
 

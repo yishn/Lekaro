@@ -1,5 +1,5 @@
 import {h, Component} from 'preact'
-import {getCurrentCoordinates} from '../geolocation';
+import {getCurrentCoordinates} from '../geolocation.js'
 
 export default class StateContainer extends Component {
   constructor(props) {
@@ -55,6 +55,7 @@ export default class StateContainer extends Component {
 
       this.setState({
         loading: false,
+        error: false,
         locationInfo: info,
         forecastData: forecast
       })

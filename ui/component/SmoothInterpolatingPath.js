@@ -1,5 +1,5 @@
 import {h, Component} from 'preact'
-import {getMonotoneCubicInterpolation} from '../interpolation';
+import {getMonotoneCubicInterpolation} from '../interpolation.js'
 
 export default class SmoothInterpolatingPath extends Component {
   render() {

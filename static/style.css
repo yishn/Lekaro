@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Raleway:400,400i,700&display=swap&subset=latin-ext');
+@import url('https://fonts.googleapis.com/css?family=Oxygen|Raleway&display=swap&subset=latin-ext');
 
 * {
   margin: 0;
@@ -13,7 +13,7 @@ body {
   --accent-color-4: #70575B;
   --accent-color-5: #869B88;
 
-  font: 100%/1.5 'Raleway', sans-serif;
+  font: 100%/1.5 Oxygen, sans-serif;
   color: #333;
 }
 
@@ -44,6 +44,7 @@ a {
     position: relative;
     padding: 1.5rem 3rem;
     border-top: 5px solid transparent;
+    font-family: Raleway, sans-serif;
   }
   .location-info.loading {
     color: #888;
@@ -85,4 +86,61 @@ a {
     margin-left: 1rem;
     font-size: 1.3rem;
     font-weight: normal;
+}
+
+.weather-timeline {
+  padding: 1rem .5rem;
+  overflow: auto;
+}
+
+.labeled-ticks {
+    display: flex;
+    position: relative;
+    height: 2.5rem;
+    list-style: none;
+    font-size: .9rem;
+  }
+  .labeled-ticks li {
+    flex: 0 0;
+    position: relative;
+  }
+  .labeled-ticks li::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: .5rem;
+    width: 1;
+    height: .3rem;
+    background: #888;
+  }
+  .labeled-ticks.labelpositionbottom li::after {
+    top: .5rem;
+    bottom: auto;
+  }
+  .labeled-ticks .label {
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translateX(-50%);
+  }
+  .labeled-ticks li:first-child .label {
+    transform: none;
+  }
+  .labeled-ticks.labelpositionbottom .label {
+    top: auto;
+    bottom: 0;
+}
+
+.cloud-cover {
+    display: flex;
+    list-style: none;
+    background: #eeeef5;
+  }
+  .cloud-cover li {
+    flex: 0 0;
+    height: 24px;
+    overflow: hidden;
+    background: #878f9a;
+    text-indent: -9999rem;
 }

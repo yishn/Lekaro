@@ -1,5 +1,7 @@
 import {h, Component} from 'preact'
-import LocationInfo from './LocationInfo';
+import {DateTime} from 'luxon'
+import LocationInfo from './LocationInfo.js'
+import WeatherTimeline from './WeatherTimeline.js'
 
 export default class App extends Component {
   get title() {
@@ -37,7 +39,17 @@ export default class App extends Component {
   }
 
   render() {
-    let {loading, locationInfo} = this.props
+    let {loading, locationInfo, forecastData} = this.props
+
+    let hourLabels = forecastData.hourly
+      && forecastData.hourly.map((entry, i) =>
+        i === 0 ? 'Now'
+        : i % 2 === 1 ? ''
+        : DateTime
+          .fromSeconds(entry.time, {zone: forecastData.timezone})
+          .toFormat('h')
+          .toLowerCase()
+      )
 
     return <div class="lekaro-app">
       <h1>Lekaro Weather</h1>
@@ -50,6 +62,11 @@ export default class App extends Component {
 
         onSearch={this.handleSearch}
         onCurrentLocationClick={this.handleCurrentLocationClick}
+      />
+
+      <WeatherTimeline
+        labels={hourLabels}
+        cloudCover={forecastData.hourly && forecastData.hourly.map(entry => entry.cloudCover)}
       />
     </div>
   }
