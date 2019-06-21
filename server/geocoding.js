@@ -56,9 +56,26 @@ export async function search(query, options = {}) {
     addressdetails: 1
   })
 
-  let result = response.map(transformNominatimResponse)
+  let isSubobjectOf = (x, y) => Object.keys(x).every(key => x[key] === y[key])
 
-  return result
+  return response
+    .reduce((acc, entry) => {
+      // Automatic location merging
+
+      for (let pushedEntry of acc) {
+        if (isSubobjectOf(pushedEntry.address, entry.address)) {
+          Object.assign(pushedEntry, entry)
+          return acc
+        } else if (isSubobjectOf(entry.address, pushedEntry.address)) {
+          return acc
+        }
+      }
+
+      acc.push(entry)
+      return acc
+    }, [])
+    .sort((x, y) => x.place_rank - y.place_rank)
+    .map(transformNominatimResponse)
 }
 
 export async function get(query, options = {}) {
@@ -73,9 +90,7 @@ export async function reverse([lon, lat], options = {}) {
       ...options,
       lon,
       lat,
-      osm_type: 'N',
-      addressdetails: 1,
-      zoom: 10
+      addressdetails: 1
     })
 
     return transformNominatimResponse(response)
