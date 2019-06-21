@@ -4,18 +4,20 @@ export function getMonotoneCubicInterpolation(xs, ys) {
 
   let createSpline = (x1, y1, x2, y2, m1, m2) => {
     let dx = x2 - x1
-    let Y1 = y1 / dx
-    let Y2 = y2 / dx
+    let dy = y2 - y1
+    if (dx === 0 || dy === 0) return x => y2
+
+    let m = dy / dx
 
     let limitSlope = m => Math.sign(m) * Math.min(Math.abs(m), 3)
     let [lm1, lm2] = [m1, m2].map(limitSlope)
 
-    let c = (lm1 + Y1) / Y2
-    let b = 3 * (1 - c) - (lm2 - lm1) / Y2
-    let a = 1 - b - c
+    let c = lm1 / m
+    let a = (lm1 + lm2) / (2 * m) - 1
+    let b = 1 - a - c
     let f = x => a * x ** 3 + b * x ** 2 + c * x
 
-    return x => f((x - x1) / dx) * y2 + (x2 - x) * y1 / dx
+    return x => f((x - x1) / dx) * dy + y1
   }
 
   let slopes = ys.map((y, i) =>
