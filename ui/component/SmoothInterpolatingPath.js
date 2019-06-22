@@ -4,16 +4,20 @@ import {getMonotoneCubicInterpolation} from '../interpolation.js'
 export default class SmoothInterpolatingPath extends Component {
   render() {
     try {
-      let {xs, ys, innerProps = {}} = this.props
+      let {xs, ys, additionalPoints = [], innerProps = {}} = this.props
       let interpolation = getMonotoneCubicInterpolation(xs, ys)
       let [xStart, xEnd] = [xs[0], xs.slice(-1)[0]]
 
       return <path
         {...innerProps}
 
-        d={[...Array(xEnd - xStart + 1)].map((_, i) => xStart + i).map((x, i) =>
-          `${i === 0 ? 'M' : 'L'}${x},${interpolation(x)}`
-        ).join(' ')}
+        d={
+          [...Array(Math.ceil(xEnd - xStart) + 1)].map((_, i) => xStart + i).map((x, i) =>
+            `${i === 0 ? 'M' : 'L'}${x},${interpolation(x)}`
+          ).join(' ') + ' ' + additionalPoints.map(([x, y]) =>
+            `L${x},${y}`
+          ).join(' ')
+        }
       />
     } catch (err) {}
   }

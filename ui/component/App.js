@@ -42,14 +42,15 @@ export default class App extends Component {
     let {loading, locationInfo, forecastData} = this.props
 
     let hourLabels = forecastData.hourly
-      && forecastData.hourly.map((entry, i) =>
-        i === 0 ? 'Now'
-        : i % 2 === 1 ? ''
-        : DateTime
+      && forecastData.hourly.map((entry, i) => {
+        let hour = DateTime
           .fromSeconds(entry.time, {zone: forecastData.timezone})
           .toFormat('h')
-          .toLowerCase()
-      )
+
+        return i === 0 ? 'Now'
+          : i === 1 || hour % 2 === 1 ? ''
+          : hour
+      })
 
     return <div class="lekaro-app">
       <h1>Lekaro Weather</h1>
@@ -74,6 +75,19 @@ export default class App extends Component {
         }
         apparentTemperature={
           forecastData.hourly && forecastData.hourly.map(entry => entry.apparentTemperature)
+        }
+        precipitation={
+          forecastData.precipitation
+          && forecastData.hourly
+          && forecastData.precipitation.map(entry => {
+            let column = forecastData.hourly.findIndex(y => entry.time < y.time)
+            if (column < 0) column = forecastData.hourly.length
+
+            return {
+              x: column - 1 + DateTime.fromSeconds(entry.time).minute / 60,
+              probability: entry.probability
+            }
+          })
         }
       />
     </div>

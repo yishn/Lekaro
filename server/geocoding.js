@@ -43,8 +43,8 @@ function transformNominatimResponse(response) {
       city: response.address.city
         || response.address.town
         || response.address.village
-        || response.address.city_district
         || response.address.county
+        || response.address.city_district
         || response.address.region
         || response.address.island
         || response.address.administrative

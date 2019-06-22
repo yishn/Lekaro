@@ -2,15 +2,16 @@ import {h, Component} from 'preact'
 import classnames from 'classnames'
 import SmoothInterpolatingPath from './SmoothInterpolatingPath.js'
 
-function LabeledTicks({columnWidth, labels, labelPosition}) {
+function LabeledTicks({columnWidth, labels, showLabels, labelPosition}) {
   return <ol
     class={classnames('labeled-ticks', {
-      labelpositionbottom: labelPosition === 'bottom'
+      labelpositionbottom: labelPosition === 'bottom',
+      showlabels: showLabels
     })}
   >{
     labels.map(label =>
       <li style={{flexBasis: columnWidth}}>
-        <span class="label">{label}</span>
+        {showLabels && <span class="label">{label}</span>}
       </li>
     )
   }</ol>
@@ -37,7 +38,28 @@ function CloudCover({columnWidth, cloudCover}) {
   }</ol>
 }
 
-function TemperatureGraph({columnWidth, height, temperature, apparentTemperature}) {
+function PrecipitationGraph({columnWidth, width, height, precipitation}) {
+  let xs = precipitation.map(entry => entry.x * columnWidth)
+  let ys = precipitation.map(entry => (1 - entry.probability) * height)
+
+  return <div class="precipitation-graph">
+    <svg
+      width={width}
+      height={height}
+    >
+      <SmoothInterpolatingPath
+        xs={[0, ...xs]}
+        ys={[ys[0], ...ys]}
+        additionalPoints={[[width, ys.slice(-1)[0]], [width, height], [0, height]]}
+        innerProps={{
+          class: 'probability'
+        }}
+      />
+    </svg>
+  </div>
+}
+
+function TemperatureGraph({columnWidth, width, height, temperature, apparentTemperature}) {
   if (temperature.length === 0) return
 
   let min = Math.floor(Math.min(...temperature, ...apparentTemperature)) - 3
@@ -45,7 +67,6 @@ function TemperatureGraph({columnWidth, height, temperature, apparentTemperature
   min = min - min % 5
   max = max + 5 - max % 5
 
-  let width = columnWidth * temperature.length
   let xs = temperature.map((_, i) => i * columnWidth + columnWidth / 2)
   let getY = t => height * (min === max ? .5 : (max - t) / (max - min))
   let tys = temperature.map(getY)
@@ -133,14 +154,10 @@ function TemperatureGraph({columnWidth, height, temperature, apparentTemperature
         <circle
           class="apparent"
           cx={x} cy={atys[i]} r="4"
-          stroke="white"
-          stroke-width="1"
         />,
 
         <circle
           cx={x} cy={tys[i]} r="4"
-          stroke="white"
-          stroke-width="1"
         />
       ])}
     </svg>
@@ -176,18 +193,21 @@ export default class WeatherTimeline extends Component {
       labels = [],
       cloudCover = [],
       temperature = [],
-      apparentTemperature = []
+      apparentTemperature = [],
+      precipitation = []
     } = this.props
 
     let graphProps = {
       columnWidth,
-      height: 200
+      height: 200,
+      width: columnWidth * labels.length
     }
 
     return <div class="weather-timeline">
       <LabeledTicks
         columnWidth={columnWidth}
         labels={labels.map(_ => '')}
+        showLabels={false}
         labelPosition="top"
       />
 
@@ -197,6 +217,11 @@ export default class WeatherTimeline extends Component {
       />
 
       <div class="graph" style={{width: columnWidth * labels.length, height: 200}}>
+        <PrecipitationGraph
+          {...graphProps}
+          precipitation={precipitation}
+        />
+
         <TemperatureGraph
           {...graphProps}
           temperature={temperature}
@@ -207,6 +232,7 @@ export default class WeatherTimeline extends Component {
       <LabeledTicks
         columnWidth={columnWidth}
         labels={labels}
+        showLabels={true}
         labelPosition="bottom"
       />
     </div>
