@@ -10,7 +10,7 @@ export default class StateContainer extends Component {
       error: false,
       locationInfo: {},
       forecastData: {},
-      units: 'us'
+      units: 'si'
     }
   }
 

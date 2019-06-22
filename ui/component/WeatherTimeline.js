@@ -51,54 +51,122 @@ function TemperatureGraph({columnWidth, height, temperature, apparentTemperature
   let tys = temperature.map(getY)
   let atys = apparentTemperature.map(getY)
 
+  let labels = temperature
+    .map((t, i, ts) => {
+      if (i === 0) {
+        return {
+          index: i,
+          position: t - min < max - t ? 'top' : 'bottom'
+        }
+      }
+
+      let strip = [...Array(13)]
+        .map((_, j) => i + j - 6)
+        .filter(j => j >= 0 && j < ts.length)
+        .map(j => t - ts[j])
+
+      if (strip.every(x => x >= 0)) {
+        return {
+          index: i,
+          position: 'bottom'
+        }
+      } else if (strip.every(x => x <= 0)) {
+        return {
+          index: i,
+          position: 'top'
+        }
+      }
+    })
+    .filter(x => !!x)
+    .reduce((acc, extrema) => {
+      if (acc.length === 0 || extrema.index - acc.slice(-1)[0].index >= 2) {
+        acc.push(extrema)
+      }
+
+      return acc
+    }, [])
+
   let helperLineStep = 5
   let helperLinesCount = (max - min) / helperLineStep + 1
 
-  if (helperLinesCount >= 6) {
+  if (helperLinesCount >= 7) {
     helperLineStep *= 2
     helperLinesCount = Math.round((helperLinesCount - 1) / 2 + 1)
   }
 
-  return <svg
-    class="temperature-graph"
-    width={width}
-    height={height}
-  >
-    <g class="helperlines">{
-      [...Array(helperLinesCount)].map((_, i) =>
-        <line
-          x1="0"
-          y1={getY(min + i * helperLineStep)}
-          x2={width}
-          y2={getY(min + i * helperLineStep)}
+  return <div class="temperature-graph">
+    <svg
+      width={width}
+      height={height}
+    >
+      <g class="helperlines">{
+        [...Array(helperLinesCount)].map((_, i) =>
+          <line
+            x1="0"
+            y1={getY(min + i * helperLineStep)}
+            x2={width}
+            y2={getY(min + i * helperLineStep)}
+            stroke-width="1"
+          />
+        )
+      }</g>
+
+      <SmoothInterpolatingPath
+        xs={[0, ...xs, width]}
+        ys={[atys[0], ...atys, ...atys.slice(-1)]}
+        innerProps={{
+          class: 'apparent',
+          fill: 'none',
+          'stroke-width': 3
+        }}
+      />
+      <SmoothInterpolatingPath
+        xs={[0, ...xs, width]}
+        ys={[tys[0], ...tys, ...tys.slice(-1)]}
+        innerProps={{
+          fill: 'none',
+          'stroke-width': 3
+        }}
+      />
+
+      {xs.map((x, i) => [
+        <circle
+          class="apparent"
+          cx={x} cy={atys[i]} r="4"
+          stroke="white"
+          stroke-width="1"
+        />,
+
+        <circle
+          cx={x} cy={tys[i]} r="4"
+          stroke="white"
           stroke-width="1"
         />
+      ])}
+    </svg>
+
+    <ol class="labels">{
+      labels.map(({index: i, position}) =>
+        <li
+          style={{
+            left: i * columnWidth + columnWidth / 2,
+            top: position === 'bottom'
+              ? getY(Math.min(temperature[i], apparentTemperature[i]))
+              : 'auto',
+            bottom: position === 'top'
+              ? height - getY(Math.max(temperature[i], apparentTemperature[i]))
+              : 'auto'
+          }}
+        >
+          {Math.abs(temperature[i] - apparentTemperature[i]) >= 1 && [
+            <em title="Feels Like Temperature">{Math.round(apparentTemperature[i])}°</em>,
+            <br/>
+          ]}
+          {Math.round(temperature[i])}°
+        </li>
       )
-    }</g>
-
-    <SmoothInterpolatingPath
-      xs={[0, ...xs, width]}
-      ys={[atys[0], ...atys, ...atys.slice(-1)]}
-      innerProps={{
-        class: 'apparent',
-        fill: 'none',
-        'stroke-width': 3
-      }}
-    />
-    <SmoothInterpolatingPath
-      xs={[0, ...xs, width]}
-      ys={[tys[0], ...tys, ...tys.slice(-1)]}
-      innerProps={{
-        fill: 'none',
-        'stroke-width': 3
-      }}
-    />
-
-    {xs.map((x, i) => [
-      <circle class="apparent" cx={x} cy={atys[i]} r="4" stroke="white" stroke-width="1"/>,
-      <circle cx={x} cy={tys[i]} r="4" stroke="white" stroke-width="1"/>
-    ])}
-  </svg>
+    }</ol>
+  </div>
 }
 
 export default class WeatherTimeline extends Component {
@@ -110,6 +178,11 @@ export default class WeatherTimeline extends Component {
       temperature = [],
       apparentTemperature = []
     } = this.props
+
+    let graphProps = {
+      columnWidth,
+      height: 200
+    }
 
     return <div class="weather-timeline">
       <LabeledTicks
@@ -125,8 +198,7 @@ export default class WeatherTimeline extends Component {
 
       <div class="graph" style={{width: columnWidth * labels.length, height: 200}}>
         <TemperatureGraph
-          columnWidth={columnWidth}
-          height={200}
+          {...graphProps}
           temperature={temperature}
           apparentTemperature={apparentTemperature}
         />
