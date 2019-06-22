@@ -7,13 +7,13 @@
 }
 
 body {
-  --accent-color-1: #F6E3AB;
+  --accent-color-1: #F9F6DE;
   --accent-color-2: #B43F5A;
   --accent-color-3: #4B1D37;
   --accent-color-4: #70575B;
   --accent-color-5: #869B88;
-  --accent-color-6: #FD6F2A;
-  --accent-color-6-40: #F0B89D;
+  --accent-color-6: #EC5E19;
+  --accent-color-6-40: #E0A78C;
   --accent-color-7: #4579b9;
 
   font: 100%/1.5 Oxygen, sans-serif;
@@ -45,7 +45,7 @@ a {
 
 .location-info {
     position: relative;
-    padding: 1.5rem 3rem;
+    padding: 1.5rem 3rem 2rem;
     border-top: 5px solid transparent;
     font-family: Raleway, sans-serif;
   }
@@ -91,12 +91,40 @@ a {
     font-weight: normal;
 }
 
+.timeline-wrapper {
+  overflow: auto;
+}
+
 .weather-timeline {
+    position: relative;
     padding: 1rem .5rem;
-    overflow: auto;
+    background: var(--accent-color-1);
   }
   .weather-timeline .graph {
     position: relative;
+}
+
+.night-background {
+    position: absolute;
+    top: 0;
+    right: .5rem;
+    bottom: 0;
+    left: .5rem;
+    list-style: none;
+  }
+  .night-background li {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: var(--accent-color-3);
+  }
+  .night-background .leftpadding {
+    left: -.5rem;
+    width: .5rem;
+  }
+  .night-background .rightpadding {
+    right: -.5rem;
+    width: .5rem;
 }
 
 .precipitation-graph, .temperature-graph {
@@ -110,10 +138,11 @@ a {
 .precipitation-graph .probability {
   fill: var(--accent-color-7);
   stroke: var(--accent-color-7);
+  opacity: .8;
 }
 
 .temperature-graph .helperlines line {
-    stroke: #ddd;
+    stroke: #888;
   }
   .temperature-graph path {
     stroke: var(--accent-color-6);
@@ -173,6 +202,9 @@ a {
     top: .5rem;
     bottom: auto;
   }
+  .labeled-ticks .invert {
+    color: #eee;
+  }
   .labeled-ticks .label {
     display: inline-block;
     position: absolute;
@@ -190,13 +222,14 @@ a {
 
 .cloud-cover {
     display: flex;
+    position: relative;
     list-style: none;
-    background: #eeeef5;
+    background: rgba(135, 143, 154, .1);
   }
   .cloud-cover li {
     flex: 0 0;
     height: 24px;
     overflow: hidden;
-    background: #878f9a;
+    background: rgb(135, 143, 154);
     text-indent: -9999rem;
 }

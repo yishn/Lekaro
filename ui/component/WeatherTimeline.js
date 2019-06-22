@@ -2,16 +2,45 @@ import {h, Component} from 'preact'
 import classnames from 'classnames'
 import SmoothInterpolatingPath from './SmoothInterpolatingPath.js'
 
-function LabeledTicks({columnWidth, labels, showLabels, labelPosition}) {
+function NightBackground({columnWidth, width, nightColumns}) {
+  return <ol class="night-background">
+    {nightColumns[0] && nightColumns[0][0] === 0 &&
+      <li class="leftpadding"></li>
+    }
+
+    {nightColumns.map(([start, end]) =>
+      <li
+        style={{
+          left: start * columnWidth,
+          width: (end - start) * columnWidth
+        }}
+      ></li>
+    )}
+
+    {nightColumns.slice(-1)[0] && nightColumns.slice(-1)[0][1] * columnWidth === width
+      && <li class="rightpadding"></li>
+    }
+  </ol>
+}
+
+function LabeledTicks({columnWidth, labels, showLabels, labelPosition, nightColumns}) {
   return <ol
     class={classnames('labeled-ticks', {
       labelpositionbottom: labelPosition === 'bottom',
       showlabels: showLabels
     })}
   >{
-    labels.map(label =>
+    labels.map((label, i) =>
       <li style={{flexBasis: columnWidth}}>
-        {showLabels && <span class="label">{label}</span>}
+        {showLabels &&
+          <span
+            class={classnames('label', {
+              invert: nightColumns.some(([start, end]) => start <= i && i <= end)
+            })}
+          >
+            {label}
+          </span>
+        }
       </li>
     )
   }</ol>
@@ -101,7 +130,11 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
     })
     .filter(x => !!x)
     .reduce((acc, extrema) => {
-      if (acc.length === 0 || extrema.index - acc.slice(-1)[0].index >= 2) {
+      if (
+        acc.length === 0
+        || extrema.index - acc.slice(-1)[0].index >= 2
+        && temperature[extrema.index] !== temperature[acc.slice(-1)[0].index]
+      ) {
         acc.push(extrema)
       }
 
@@ -177,13 +210,17 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
           }}
         >
           {apparentTemperature[i] - temperature[i] >= 1 && [
-            <em title="Feels Like Temperature">{Math.round(apparentTemperature[i])}°</em>,
+            <em title={`Feels like ${Math.round(apparentTemperature[i])}°`}>
+              {Math.round(apparentTemperature[i])}°
+            </em>,
             <br/>
           ]}
           {Math.round(temperature[i])}°
           {temperature[i] - apparentTemperature[i] >= 1 && [
             <br/>,
-            <em title="Feels Like Temperature">{Math.round(apparentTemperature[i])}°</em>
+            <em title={`Feels like ${Math.round(apparentTemperature[i])}°`}>
+              {Math.round(apparentTemperature[i])}°
+            </em>
           ]}
         </li>
       )
@@ -196,24 +233,34 @@ export default class WeatherTimeline extends Component {
     let {
       columnWidth = 28,
       labels = [],
+      nightColumns = [],
       cloudCover = [],
       temperature = [],
       apparentTemperature = [],
       precipitation = []
     } = this.props
 
+    let width = columnWidth * labels.length
+
     let graphProps = {
       columnWidth,
       height: 200,
-      width: columnWidth * labels.length
+      width
     }
 
-    return <div class="weather-timeline">
+    return <div class="weather-timeline" style={{boxSizing: 'content-box', width}}>
+      <NightBackground
+        columnWidth={columnWidth}
+        width={width}
+        nightColumns={nightColumns}
+      />
+
       <LabeledTicks
         columnWidth={columnWidth}
         labels={labels.map(_ => '')}
         showLabels={false}
         labelPosition="top"
+        nightColumns={nightColumns}
       />
 
       <CloudCover
@@ -239,6 +286,7 @@ export default class WeatherTimeline extends Component {
         labels={labels}
         showLabels={true}
         labelPosition="bottom"
+        nightColumns={nightColumns}
       />
     </div>
   }
