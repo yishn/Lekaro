@@ -69,7 +69,7 @@ function CloudCover({columnWidth, cloudCover}) {
 
 function PrecipitationGraph({columnWidth, width, height, precipitation}) {
   let xs = precipitation.map(entry => entry.x * columnWidth)
-  let ys = precipitation.map(entry => (1 - entry.probability) * height)
+  let ys = precipitation.map(entry => entry.probability * height)
 
   return <div class="precipitation-graph">
     <svg
@@ -79,7 +79,7 @@ function PrecipitationGraph({columnWidth, width, height, precipitation}) {
       <SmoothInterpolatingPath
         xs={[0, ...xs]}
         ys={[ys[0], ...ys]}
-        additionalPoints={[[width, ys.slice(-1)[0]], [width, height], [0, height]]}
+        additionalPoints={[[width, ys.slice(-1)[0]], [width, 0], [0, 0]]}
         innerProps={{
           class: 'probability',
           'stroke-width': 3
@@ -133,7 +133,7 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
       if (
         acc.length === 0
         || extrema.index - acc.slice(-1)[0].index >= 2
-        && temperature[extrema.index] !== temperature[acc.slice(-1)[0].index]
+        && Math.round(temperature[extrema.index]) !== Math.round(temperature[acc.slice(-1)[0].index])
       ) {
         acc.push(extrema)
       }

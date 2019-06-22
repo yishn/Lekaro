@@ -138,7 +138,7 @@ a {
 .precipitation-graph .probability {
   fill: var(--accent-color-7);
   stroke: var(--accent-color-7);
-  opacity: .8;
+  opacity: .9;
 }
 
 .temperature-graph .helperlines line {
