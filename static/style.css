@@ -12,9 +12,9 @@ body {
   --accent-color-3: #4B1D37;
   --accent-color-4: #70575B;
   --accent-color-5: #869B88;
-  --accent-color-6: #DB4F08;
+  --accent-color-6: #FD6F2A;
   --accent-color-6-40: #F0B89D;
-  --accent-color-7: #9ADFE3;
+  --accent-color-7: #4579b9;
 
   font: 100%/1.5 Oxygen, sans-serif;
   color: #333;
@@ -107,6 +107,11 @@ a {
   height: 100%;
 }
 
+.precipitation-graph .probability {
+  fill: var(--accent-color-7);
+  stroke: var(--accent-color-7);
+}
+
 .temperature-graph .helperlines line {
     stroke: #ddd;
   }
@@ -134,16 +139,11 @@ a {
     font-weight: bold;
     line-height: 1.2;
     text-align: center;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
     transform: translateX(-50%);
   }
   .temperature-graph .labels li em {
     color: var(--accent-color-6-40);
     font-style: normal;
-}
-
-.precipitation-graph .probability {
-  fill: var(--accent-color-7);
 }
 
 .labeled-ticks {

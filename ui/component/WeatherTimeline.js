@@ -52,7 +52,8 @@ function PrecipitationGraph({columnWidth, width, height, precipitation}) {
         ys={[ys[0], ...ys]}
         additionalPoints={[[width, ys.slice(-1)[0]], [width, height], [0, height]]}
         innerProps={{
-          class: 'probability'
+          class: 'probability',
+          'stroke-width': 3
         }}
       />
     </svg>
@@ -175,11 +176,15 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
               : 'auto'
           }}
         >
-          {Math.abs(temperature[i] - apparentTemperature[i]) >= 1 && [
+          {apparentTemperature[i] - temperature[i] >= 1 && [
             <em title="Feels Like Temperature">{Math.round(apparentTemperature[i])}°</em>,
             <br/>
           ]}
           {Math.round(temperature[i])}°
+          {temperature[i] - apparentTemperature[i] >= 1 && [
+            <br/>,
+            <em title="Feels Like Temperature">{Math.round(apparentTemperature[i])}°</em>
+          ]}
         </li>
       )
     }</ol>

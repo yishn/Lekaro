@@ -13,7 +13,7 @@ export function getMonotoneCubicInterpolation(xs, ys) {
     let [lm1, lm2] = [m1, m2].map(limitSlope)
 
     let c = lm1 / m
-    let a = (lm1 + lm2) / (2 * m) - 1
+    let a = (lm1 + lm2) / m - 2
     let b = 1 - a - c
     let f = x => a * x ** 3 + b * x ** 2 + c * x
 
