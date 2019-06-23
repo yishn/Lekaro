@@ -119,13 +119,13 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
   max = max + 5 - (max % 5 + 5) % 5
 
   let helperLineStep = 5
-  let helperLinesCount = (max - min) / helperLineStep + 1
+  let helperLineCount = (max - min) / helperLineStep + 1
 
-  if (helperLinesCount >= 7) {
-    helperLineStep = 10
+  while (helperLineCount >= 7) {
+    helperLineStep += 5
     min = min - (min % helperLineStep + helperLineStep) % helperLineStep
     max = max + ((helperLineStep - max) % helperLineStep + helperLineStep) % helperLineStep
-    helperLinesCount = (max - min) / helperLineStep + 1
+    helperLineCount = (max - min) / helperLineStep + 1
   }
 
   let xs = temperature.map((_, i) => i * columnWidth + columnWidth / 2)
@@ -178,7 +178,7 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
       height={height}
     >
       <g class="helperlines">
-        {[...Array(helperLinesCount)].map((_, i) =>
+        {[...Array(helperLineCount)].map((_, i) =>
           <line
             x1="0"
             y1={getY(min + i * helperLineStep)}
