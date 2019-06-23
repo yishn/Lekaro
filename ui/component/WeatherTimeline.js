@@ -116,7 +116,17 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
   let min = Math.floor(Math.min(...temperature, ...apparentTemperature)) - 3
   let max = Math.ceil(Math.max(...temperature, ...apparentTemperature)) + 3
   min = min - (min % 5 + 5) % 5
-  max = max + 5 - (max % 5 + 5)
+  max = max + 5 - (max % 5 + 5) % 5
+
+  let helperLineStep = 5
+  let helperLinesCount = (max - min) / helperLineStep + 1
+
+  if (helperLinesCount >= 7) {
+    helperLineStep = 10
+    min = min - (min % helperLineStep + helperLineStep) % helperLineStep
+    max = max + ((helperLineStep - max) % helperLineStep + helperLineStep) % helperLineStep
+    helperLinesCount = (max - min) / helperLineStep + 1
+  }
 
   let xs = temperature.map((_, i) => i * columnWidth + columnWidth / 2)
   let getY = t => height * (min === max ? .5 : (max - t) / (max - min))
@@ -161,14 +171,6 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
 
       return acc
     }, [])
-
-  let helperLineStep = 5
-  let helperLinesCount = (max - min) / helperLineStep + 1
-
-  if (helperLinesCount >= 7) {
-    helperLineStep *= 2
-    helperLinesCount = Math.round((helperLinesCount - 1) / 2 + 1)
-  }
 
   return <div class="temperature-graph">
     <svg
