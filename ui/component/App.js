@@ -41,12 +41,12 @@ export default class App extends Component {
   render() {
     let {loading, locationInfo, forecastData} = this.props
 
-    let getColumnFromTime = time => {
-      if (time < forecastData.hourly[0].time) return 0
-      if (time > forecastData.hourly.slice(-1)[0].time) return forecastData.hourly.length
+    let getColumnFromTimestamp = timestamp => {
+      if (timestamp < forecastData.hourly[0].time) return 0
+      if (timestamp > forecastData.hourly.slice(-1)[0].time) return forecastData.hourly.length
 
-      let dateTime = time.fromUnixTimestamp(time, forecastData.timezone)
-      let column = forecastData.hourly.findIndex(y => time < y.time)
+      let dateTime = time.fromUnixTimestamp(timestamp, forecastData.timezone)
+      let column = forecastData.hourly.findIndex(y => timestamp < y.time)
       if (column < 0) column = forecastData.hourly.length
 
       return column - 1 + dateTime.minute / 60
@@ -82,11 +82,13 @@ export default class App extends Component {
             && [...forecastData.daily, null]
               .map((entry, i, entries) =>
                 entry == null ? [
-                  entries[i - 1] == null ? 0
-                    : entries[i - 1].sunsetTime != null ? entries[i - 1].sunsetTime
-                    : entries[i - 1].time,
-                  entries[i - 1].time + 24 * 60 * 60
-                ].map(getColumnFromTime)
+                  getColumnFromTimestamp(
+                    entries[i - 1] == null ? 0
+                      : entries[i - 1].sunsetTime != null ? entries[i - 1].sunsetTime
+                      : entries[i - 1].time
+                  ),
+                  forecastData.hourly.length
+                ]
                 : (
                   entry.sunriseTime == null
                     ? [entry.time, (entries[i + 1] || {}).time || entry.time + 24 * 60 * 60]
@@ -95,11 +97,15 @@ export default class App extends Component {
                   : entries[i - 1].sunsetTime != null
                     ? [entries[i - 1].sunsetTime, entry.sunriseTime]
                   : [entry.time, entry.sunriseTime]
-                ).map(getColumnFromTime)
+                ).map(getColumnFromTimestamp)
               )
               .filter(([start, end]) => start !== end)
           }
           labels={hourLabels}
+          uvIndex={
+            forecastData.hourly
+            && forecastData.hourly.map(entry => entry.uvIndex)
+          }
           cloudCover={
             forecastData.hourly
             && forecastData.hourly.map(entry => entry.cloudCover)
@@ -116,7 +122,7 @@ export default class App extends Component {
             forecastData.precipitation
             && forecastData.hourly
             && forecastData.precipitation.map((entry, i) => ({
-              x: i === 0 ? 0 : getColumnFromTime(entry.time),
+              x: i === 0 ? 0 : getColumnFromTimestamp(entry.time),
               probability: entry.probability
             }))
           }

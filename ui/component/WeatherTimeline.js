@@ -23,14 +23,35 @@ function NightBackground({columnWidth, width, nightColumns}) {
   </ol>
 }
 
+function SunBar({columnWidth, uvIndex}) {
+  return <ol class="sun-bar">
+    {uvIndex.map(x =>
+      <li
+        class={`uv ${
+          x < 3 ? 'green'
+          : x < 6 ? 'yellow'
+          : x < 8 ? 'orange'
+          : x < 11 ? 'red'
+          : 'violet'
+        }`}
+        style={{
+          flexBasis: columnWidth
+        }}
+      >
+        {x !== 0 && <span>{x}</span>}
+      </li>
+    )}
+  </ol>
+}
+
 function LabeledTicks({columnWidth, labels, showLabels, labelPosition, nightColumns}) {
   return <ol
     class={classnames('labeled-ticks', {
       labelpositionbottom: labelPosition === 'bottom',
       showlabels: showLabels
     })}
-  >{
-    labels.map((label, i) =>
+  >
+    {labels.map((label, i) =>
       <li style={{flexBasis: columnWidth}}>
         {showLabels &&
           <span
@@ -42,8 +63,8 @@ function LabeledTicks({columnWidth, labels, showLabels, labelPosition, nightColu
           </span>
         }
       </li>
-    )
-  }</ol>
+    )}
+  </ol>
 }
 
 function CloudCover({columnWidth, cloudCover}) {
@@ -55,16 +76,16 @@ function CloudCover({columnWidth, cloudCover}) {
       : 'Overcast'
     )}`
 
-  return <ol class="cloud-cover" style={{width: cloudCover.length * columnWidth}}>{
-    cloudCover.map(cover =>
+  return <ol class="cloud-cover" style={{width: cloudCover.length * columnWidth}}>
+    {cloudCover.map(cover =>
       <li
         style={{flexBasis: columnWidth, opacity: cover}}
         title={getCloudCoverDescription(cover)}
       >
         {getCloudCoverDescription(cover)}
       </li>
-    )
-  }</ol>
+    )}
+  </ol>
 }
 
 function PrecipitationGraph({columnWidth, width, height, precipitation}) {
@@ -154,8 +175,8 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
       width={width}
       height={height}
     >
-      <g class="helperlines">{
-        [...Array(helperLinesCount)].map((_, i) =>
+      <g class="helperlines">
+        {[...Array(helperLinesCount)].map((_, i) =>
           <line
             x1="0"
             y1={getY(min + i * helperLineStep)}
@@ -163,8 +184,8 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
             y2={getY(min + i * helperLineStep)}
             stroke-width="1"
           />
-        )
-      }</g>
+        )}
+      </g>
 
       <SmoothInterpolatingPath
         xs={[0, ...xs, width]}
@@ -196,8 +217,8 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
       ])}
     </svg>
 
-    <ol class="labels">{
-      labels.map(({index: i, position}) =>
+    <ol class="labels">
+      {labels.map(({index: i, position}) =>
         <li
           style={{
             left: i * columnWidth + columnWidth / 2,
@@ -223,8 +244,8 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
             </em>
           ]}
         </li>
-      )
-    }</ol>
+      )}
+    </ol>
   </div>
 }
 
@@ -233,6 +254,7 @@ export default class WeatherTimeline extends Component {
     let {
       columnWidth = 28,
       labels = [],
+      uvIndex = [],
       nightColumns = [],
       cloudCover = [],
       temperature = [],
@@ -253,6 +275,11 @@ export default class WeatherTimeline extends Component {
         columnWidth={columnWidth}
         width={width}
         nightColumns={nightColumns}
+      />
+
+      <SunBar
+        columnWidth={columnWidth}
+        uvIndex={uvIndex}
       />
 
       <LabeledTicks

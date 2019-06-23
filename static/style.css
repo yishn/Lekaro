@@ -97,7 +97,7 @@ a {
 
 .weather-timeline {
     position: relative;
-    padding: 1rem .5rem;
+    padding: 1px .5rem 1rem;
     background: var(--accent-color-1);
   }
   .weather-timeline .graph {
@@ -219,6 +219,47 @@ a {
     top: auto;
     bottom: 0;
 }
+
+.sun-bar {
+    display: flex;
+    position: relative;
+    margin: .5rem 0;
+    list-style: none;
+  }
+  .sun-bar li {
+    display: flex;
+    justify-content: center;
+    flex: 0 0;
+    height: 24px;
+    overflow: hidden;
+  }
+  .sun-bar .uv span {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    text-align: center;
+    font-size: .8rem;
+    background: #ddd;
+  }
+  .sun-bar .uv.green span {
+    background: #9AD739;
+  }
+  .sun-bar .uv.yellow span {
+    background: #FFDB1E;
+  }
+  .sun-bar .uv.orange span {
+    background: #E48E1D;
+    color: white;
+  }
+  .sun-bar .uv.red span {
+    background: #D1361B;
+    color: white;
+  }
+  .sun-bar .uv.violet span {
+    background: #7E03AF;
+    color: white;
+  }
 
 .cloud-cover {
     display: flex;
