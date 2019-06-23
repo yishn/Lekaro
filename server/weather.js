@@ -49,31 +49,52 @@ function transformDarkSkyResponse(response) {
     license: 'Powered by Dark Sky',
     timezone: response.timezone,
     precipitation,
-    hourly: [currently, ...hourly.data].map(entry => extract([
-      'time',
-      'icon',
-      'temperature',
-      'apparentTemperature',
-      'dewPoint',
-      'humidity',
-      'pressure',
-      'windSpeed',
-      'windGust',
-      'windBearing',
-      'cloudCover',
-      'uvIndex',
-      'visibility',
-      'ozone'
-    ], entry)),
+    hourly: [currently, ...hourly.data]
+      .map(entry => extract([
+        'time',
+        'icon',
+        'temperature',
+        'apparentTemperature',
+        'dewPoint',
+        'humidity',
+        'pressure',
+        'windSpeed',
+        'windGust',
+        'windBearing',
+        'cloudCover',
+        'uvIndex',
+        'visibility',
+        'ozone'
+      ], entry)),
 
-    daily: daily.data.map(entry => extract([
-      'time',
-      'summary',
-      'icon',
-      'sunriseTime',
-      'sunsetTime',
-      'moonPhase'
-    ], entry))
+    daily: daily.data
+      .map(entry => extract([
+        'time',
+        'summary',
+        'icon',
+        'sunriseTime',
+        'sunsetTime',
+        'moonPhase'
+      ], entry))
+      .map((entry, i) => {
+        if (
+          entry.sunriseTime == null
+          && entry.sunsetTime == null
+          && daily.data[i].uvIndex === 0
+        ) {
+          // Always night, don't supply sunrise/sunset
+        } else {
+          if (entry.sunriseTime == null) {
+            entry.sunriseTime = entry.time
+          }
+
+          if (entry.sunsetTime == null) {
+            entry.sunsetTime = (entry[i + 1] || {}).time || entry.time + 24 * 60 * 60
+          }
+        }
+
+        return entry
+      })
   }
 }
 

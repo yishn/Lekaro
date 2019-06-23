@@ -1,5 +1,5 @@
 import {h, Component} from 'preact'
-import {DateTime} from 'luxon'
+import * as time from '../time.js'
 import LocationInfo from './LocationInfo.js'
 import WeatherTimeline from './WeatherTimeline.js'
 
@@ -45,7 +45,7 @@ export default class App extends Component {
       if (time < forecastData.hourly[0].time) return 0
       if (time > forecastData.hourly.slice(-1)[0].time) return forecastData.hourly.length
 
-      let dateTime = DateTime.fromSeconds(time, {zone: forecastData.timezone})
+      let dateTime = time.fromUnixTimestamp(time, forecastData.timezone)
       let column = forecastData.hourly.findIndex(y => time < y.time)
       if (column < 0) column = forecastData.hourly.length
 
@@ -54,9 +54,7 @@ export default class App extends Component {
 
     let hourLabels = forecastData.hourly
       && forecastData.hourly.map((entry, i) => {
-        let hour = DateTime
-          .fromSeconds(entry.time, {zone: forecastData.timezone})
-          .toFormat('h')
+        let hour = time.fromUnixTimestamp(entry.time, forecastData.timezone).toFormat('h')
 
         return i === 0 ? 'Now'
           : i === 1 || hour % 2 === 1 ? ''
@@ -83,16 +81,20 @@ export default class App extends Component {
             && forecastData.hourly
             && [...forecastData.daily, null]
               .map((entry, i, entries) =>
-                entry == null
-                ? [
-                  entries[i - 1] == null
-                    ? 0
-                    : getColumnFromTime(entries[i - 1].sunsetTime),
-                  hourLabels.length
-                ]
+                entry == null ? [
+                  entries[i - 1] == null ? 0
+                    : entries[i - 1].sunsetTime != null ? entries[i - 1].sunsetTime
+                    : entries[i - 1].time,
+                  entries[i - 1].time + 24 * 60 * 60
+                ].map(getColumnFromTime)
                 : (
-                  i === 0 ? [entry.time, entry.sunriseTime]
-                  : [entries[i - 1].sunsetTime, entry.sunriseTime]
+                  entry.sunriseTime == null
+                    ? [entry.time, (entries[i + 1] || {}).time || entry.time + 24 * 60 * 60]
+                  : i === 0
+                    ? [entry.time, entry.sunriseTime]
+                  : entries[i - 1].sunsetTime != null
+                    ? [entries[i - 1].sunsetTime, entry.sunriseTime]
+                  : [entry.time, entry.sunriseTime]
                 ).map(getColumnFromTime)
               )
               .filter(([start, end]) => start !== end)

@@ -94,8 +94,8 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
 
   let min = Math.floor(Math.min(...temperature, ...apparentTemperature)) - 3
   let max = Math.ceil(Math.max(...temperature, ...apparentTemperature)) + 3
-  min = min - min % 5
-  max = max + 5 - max % 5
+  min = min - (min % 5 + 5) % 5
+  max = max + 5 - (max % 5 + 5)
 
   let xs = temperature.map((_, i) => i * columnWidth + columnWidth / 2)
   let getY = t => height * (min === max ? .5 : (max - t) / (max - min))
