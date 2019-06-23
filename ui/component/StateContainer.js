@@ -18,7 +18,7 @@ export default class StateContainer extends Component {
     let {hash} = window.location
 
     if (hash != null && hash.length > 1) {
-      let coordinates = hash.slice(1).split(',')
+      let coordinates = hash.slice(1).split(',').slice(0, 2).reverse()
       this.loadForecast({coordinates, ...options})
     } else {
       this.loadForecast(options)
@@ -41,7 +41,7 @@ export default class StateContainer extends Component {
     let enc = encodeURIComponent
     let url = name != null
       ? `/forecast?name=${enc(name)}`
-      : `/forecast?lon=${enc(coordinates[0])}&lat=${enc(coordinates[1])}`
+      : `/forecast?lat=${enc(coordinates[1])}&lon=${enc(coordinates[0])}`
 
     try {
       let response = await fetch(`${url}&units=${enc(this.state.units)}&language=en-US`)
@@ -50,7 +50,7 @@ export default class StateContainer extends Component {
       let {info, forecast} = await response.json()
 
       if (pushHistory) {
-        history.pushState(null, '', `#${info.coordinates.join(',')}`)
+        history.pushState(null, '', `#${info.coordinates.reverse().join(',')}`)
       }
 
       this.setState({
