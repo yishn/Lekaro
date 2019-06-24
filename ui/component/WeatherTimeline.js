@@ -91,7 +91,7 @@ function SunBar({columnWidth, uvIndex}) {
         }}
       >
         {x != null && x !== 0 &&
-          <span>{x}</span>
+          <span>{Math.ceil(x)}</span>
         }
       </li>
     )}
