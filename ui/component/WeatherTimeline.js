@@ -91,7 +91,7 @@ function SunBar({columnWidth, uvIndex}) {
         }}
       >
         {x != null && x !== 0 &&
-          <span>{Math.ceil(x)}</span>
+          <span>{Math.floor(x)}</span>
         }
       </li>
     )}
@@ -178,7 +178,7 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
   while (helperLineCount >= 7) {
     helperLineStep += 5
     min = min - (min % helperLineStep + helperLineStep) % helperLineStep
-    max = max + ((helperLineStep - max) % helperLineStep + helperLineStep) % helperLineStep
+    max = max + helperLineStep - (max % helperLineStep + helperLineStep) % helperLineStep
     helperLineCount = (max - min) / helperLineStep + 1
   }
 
