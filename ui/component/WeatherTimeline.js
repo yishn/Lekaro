@@ -16,12 +16,7 @@ function NightBackground({columnWidth, width, nightColumns}) {
         }}
       >
         {moonPhase != null && end - start >= 1 &&
-          <svg
-            class="moon"
-            width="1.2rem"
-            height="1.2rem"
-            viewBox="0 0 1 1"
-          >
+          <svg class="moon" width="1.2rem" height="1.2rem" viewBox="0 0 1 1">
             <title>
               {moonPhase === 0 ? 'New Moon'
                 : moonPhase < .25 ? 'Waxing Crescent'
@@ -30,7 +25,10 @@ function NightBackground({columnWidth, width, nightColumns}) {
                 : moonPhase === .5 ? 'Full Moon'
                 : moonPhase < .75 ? 'Waning Gibbous'
                 : moonPhase === .75 ? 'Last Quarter Moon'
-                : 'Waning Crescent'}
+                : 'Waning Crescent'}{'\n'}
+              Illumination: {
+                Math.round((moonPhase <= .5 ? moonPhase * 2 : 2 - moonPhase * 2) * 100)
+              }%
             </title>
 
             <circle cx=".5" cy=".5" r=".4" stroke-width=".1" fill="transparent" />
