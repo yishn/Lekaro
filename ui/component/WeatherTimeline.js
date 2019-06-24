@@ -67,7 +67,7 @@ function LabeledTicks({columnWidth, labels, showLabels, labelPosition, nightColu
   </ol>
 }
 
-function CloudCover({columnWidth, cloudCover}) {
+function CloudBar({columnWidth, cloudCover}) {
   let getCloudCoverDescription = cover =>
     `${Math.round(cover * 100)}%: ${(
       cover < .25 ? 'Clear'
@@ -76,13 +76,13 @@ function CloudCover({columnWidth, cloudCover}) {
       : 'Overcast'
     )}`
 
-  return <ol class="cloud-cover" style={{width: cloudCover.length * columnWidth}}>
+  return <ol class="cloud-bar" style={{width: cloudCover.length * columnWidth}}>
     {cloudCover.map(cover =>
       <li
-        style={{flexBasis: columnWidth, opacity: cover}}
+        style={{flexBasis: columnWidth}}
         title={getCloudCoverDescription(cover)}
       >
-        {getCloudCoverDescription(cover)}
+        <div class="cover" style={{opacity: cover}}>{getCloudCoverDescription(cover)}</div>
       </li>
     )}
   </ol>
@@ -202,6 +202,7 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
         xs={[0, ...xs, width]}
         ys={[tys[0], ...tys, ...tys.slice(-1)]}
         innerProps={{
+          class: 'temperature',
           fill: 'none',
           'stroke-width': 3
         }}
@@ -214,6 +215,7 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
         />,
 
         <circle
+          class="temperature"
           cx={x} cy={tys[i]} r="4"
         />
       ])}
@@ -292,7 +294,7 @@ export default class WeatherTimeline extends Component {
         nightColumns={nightColumns}
       />
 
-      <CloudCover
+      <CloudBar
         columnWidth={columnWidth}
         cloudCover={cloudCover}
       />

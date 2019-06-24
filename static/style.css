@@ -141,20 +141,20 @@ a {
   opacity: .9;
 }
 
-.temperature-graph .helperlines line {
+.temperature-graph .helperlines {
     stroke: #888;
-  }
-  .temperature-graph path {
-    stroke: var(--accent-color-6);
   }
   .temperature-graph path.apparent {
     stroke: var(--accent-color-6-40);
   }
-  .temperature-graph circle {
-    fill: var(--accent-color-6);
+  .temperature-graph path.temperature {
+    stroke: var(--accent-color-6);
   }
   .temperature-graph circle.apparent {
     fill: var(--accent-color-6-40);
+  }
+  .temperature-graph circle.temperature {
+    fill: var(--accent-color-6);
   }
   .temperature-graph .labels {
     list-style: none;
@@ -261,15 +261,23 @@ a {
     color: white;
   }
 
-.cloud-cover {
+.cloud-bar {
     display: flex;
     position: relative;
+    height: 24px;
     list-style: none;
     background: rgba(135, 143, 154, .1);
   }
-  .cloud-cover li {
+  .cloud-bar li {
     flex: 0 0;
-    height: 24px;
+    position: relative;
+  }
+  .cloud-bar .cover {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     overflow: hidden;
     background: rgb(135, 143, 154);
     text-indent: -9999rem;
