@@ -80,26 +80,34 @@ export default class App extends Component {
             forecastData.daily
             && forecastData.hourly
             && [...forecastData.daily, null]
-              .map((entry, i, entries) =>
-                entry == null ? [
-                  getColumnFromTimestamp(
-                    entries[i - 1] == null ? 0
-                      : entries[i - 1].sunsetTime != null ? entries[i - 1].sunsetTime
-                      : entries[i - 1].time
-                  ),
-                  forecastData.hourly.length
-                ]
-                : (
-                  entry.sunriseTime == null
-                    ? [entry.time, (entries[i + 1] || {}).time || entry.time + 24 * 60 * 60]
-                  : i === 0
-                    ? [entry.time, entry.sunriseTime]
-                  : entries[i - 1].sunsetTime != null
-                    ? [entries[i - 1].sunsetTime, entry.sunriseTime]
-                  : [entry.time, entry.sunriseTime]
-                ).map(getColumnFromTimestamp)
-              )
-              .filter(([start, end]) => start !== end)
+              .map((entry, i, entries) => ({
+                moonPhase: (entries[i - 1] || entry).moonPhase,
+                ...(
+                  entry == null ? {
+                    start: getColumnFromTimestamp(
+                      entries[i - 1] == null ? 0
+                        : entries[i - 1].sunsetTime != null ? entries[i - 1].sunsetTime
+                        : entries[i - 1].time
+                    ),
+                    end: forecastData.hourly.length
+                  }
+                  : (
+                    entry.sunriseTime == null
+                      ? [entry.time, (entries[i + 1] || {}).time || entry.time + 24 * 60 * 60]
+                    : i === 0
+                      ? [entry.time, entry.sunriseTime]
+                    : entries[i - 1].sunsetTime != null
+                      ? [entries[i - 1].sunsetTime, entry.sunriseTime]
+                    : [entry.time, entry.sunriseTime]
+                  )
+                  .map(getColumnFromTimestamp)
+                  .reduce((acc, x, i) => {
+                    acc[i === 0 ? 'start' : 'end'] = x
+                    return acc
+                  }, {})
+                )
+              }))
+              .filter(({start, end}) => start !== end)
           }
           labels={hourLabels}
           uvIndex={

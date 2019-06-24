@@ -125,6 +125,12 @@ a {
   .night-background .rightpadding {
     right: -.5rem;
     width: .5rem;
+  }
+  .night-background .moon {
+    display: block;
+    margin: .5rem auto 0;
+    stroke: #eee;
+    fill: #eee;
 }
 
 .precipitation-graph, .temperature-graph {
@@ -225,18 +231,19 @@ a {
     position: relative;
     margin: .5rem 0;
     list-style: none;
+    pointer-events: none;
   }
   .sun-bar li {
     display: flex;
     justify-content: center;
     flex: 0 0;
-    height: 24px;
+    height: 1.2rem;
     overflow: hidden;
   }
   .sun-bar .uv span {
     display: inline-block;
-    width: 1.5em;
-    height: 1.5em;
+    width: 1.2rem;
+    height: 1.2rem;
     border-radius: 50%;
     text-align: center;
     font-size: .8rem;

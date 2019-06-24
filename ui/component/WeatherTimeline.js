@@ -4,21 +4,68 @@ import SmoothInterpolatingPath from './SmoothInterpolatingPath.js'
 
 function NightBackground({columnWidth, width, nightColumns}) {
   return <ol class="night-background">
-    {nightColumns[0] && nightColumns[0][0] === 0 &&
+    {nightColumns[0] && nightColumns[0].start === 0 &&
       <li class="leftpadding"></li>
     }
 
-    {nightColumns.map(([start, end]) =>
+    {nightColumns.map(({start, end, moonPhase}) =>
       <li
         style={{
           left: start * columnWidth,
           width: (end - start) * columnWidth
         }}
-      ></li>
+      >
+        {moonPhase != null && end - start >= 1 &&
+          <svg
+            class="moon"
+            width="1.2rem"
+            height="1.2rem"
+            viewBox="0 0 1 1"
+          >
+            <title>
+              {moonPhase === 0 ? 'New Moon'
+                : moonPhase < .25 ? 'Waxing Crescent'
+                : moonPhase === .25 ? 'First Quarter Moon'
+                : moonPhase < .5 ? 'Waxing Gibbous'
+                : moonPhase === .5 ? 'Full Moon'
+                : moonPhase < .75 ? 'Waning Gibbous'
+                : moonPhase === .75 ? 'Last Quarter Moon'
+                : 'Waning Crescent'}
+            </title>
+
+            <circle cx=".5" cy=".5" r=".4" stroke-width=".1" fill="transparent" />
+
+            <path
+              stroke-width="0"
+              d={
+                [...Array(51)].map((_, i) => {
+                  let midFraction = moonPhase <= .5
+                    ? 1 - moonPhase * 2
+                    : 2 - moonPhase * 2
+
+                  let right = Math.sqrt(.4 ** 2 - (i * .8 / 50 - .4) ** 2) + .5
+                  let left = 1 - right
+                  let type = i === 0 ? 'M' : 'L'
+                  let coord = [right * midFraction + left * (1 - midFraction), i * .8 / 50 + .1]
+
+                  return `${type}${coord.join(',')}`
+                }).join(' ') + ' ' + [...Array(51)].map((_, i) => {
+                  let x = Math.sqrt(.4 ** 2 - (i * .8 / 50 - .4) ** 2) + .5
+                  if (moonPhase > .5) x = 1 - x
+
+                  let coord = [x, .9 - i * .8 / 50]
+
+                  return `L${coord.join(',')}`
+                }).join(' ')
+              }
+            />
+          </svg>
+        }
+      </li>
     )}
 
-    {nightColumns.slice(-1)[0] && nightColumns.slice(-1)[0][1] * columnWidth === width
-      && <li class="rightpadding"></li>
+    {nightColumns.slice(-1)[0] && nightColumns.slice(-1)[0].end * columnWidth === width &&
+      <li class="rightpadding"></li>
     }
   </ol>
 }
@@ -28,7 +75,8 @@ function SunBar({columnWidth, uvIndex}) {
     {uvIndex.map(x =>
       <li
         class={`uv ${
-          x < 3 ? 'green'
+          x == null || x === 0 ? ''
+          : x < 3 ? 'green'
           : x < 6 ? 'yellow'
           : x < 8 ? 'orange'
           : x < 11 ? 'red'
@@ -38,7 +86,9 @@ function SunBar({columnWidth, uvIndex}) {
           flexBasis: columnWidth
         }}
       >
-        {x !== 0 && <span>{x}</span>}
+        {x != null && x !== 0 &&
+          <span>{x}</span>
+        }
       </li>
     )}
   </ol>
@@ -56,7 +106,7 @@ function LabeledTicks({columnWidth, labels, showLabels, labelPosition, nightColu
         {showLabels &&
           <span
             class={classnames('label', {
-              invert: nightColumns.some(([start, end]) => start <= i && i <= end)
+              invert: nightColumns.some(({start, end}) => start <= i && i <= end)
             })}
           >
             {label}
@@ -256,7 +306,7 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
 export default class WeatherTimeline extends Component {
   render() {
     let {
-      columnWidth = 28,
+      columnWidth = 24,
       labels = [],
       uvIndex = [],
       nightColumns = [],
