@@ -1,7 +1,7 @@
 import {h, Component} from 'preact'
 import {getMonotoneCubicInterpolation} from '../interpolation.js'
 
-export default class SmoothInterpolatingPath extends Component {
+export default class SmoothInterpolatingCurve extends Component {
   render() {
     try {
       let {xs, ys, additionalPoints = [], innerProps = {}} = this.props

@@ -1,6 +1,6 @@
 import {h, Component} from 'preact'
 import classnames from 'classnames'
-import SmoothInterpolatingPath from './SmoothInterpolatingPath.js'
+import SmoothInterpolatingCurve from './SmoothInterpolatingCurve.js'
 
 function NightBackground({columnWidth, width, nightColumns}) {
   return <ol class="night-background">
@@ -145,7 +145,7 @@ function PrecipitationGraph({columnWidth, width, height, precipitation}) {
       width={width}
       height={height}
     >
-      <SmoothInterpolatingPath
+      <SmoothInterpolatingCurve
         xs={[0, ...xs]}
         ys={[ys[0], ...ys]}
         additionalPoints={[[width, ys.slice(-1)[0]], [width, 0], [0, 0]]}
@@ -237,7 +237,7 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
         )}
       </g>
 
-      <SmoothInterpolatingPath
+      <SmoothInterpolatingCurve
         xs={[0, ...xs, width]}
         ys={[atys[0], ...atys, ...atys.slice(-1)]}
         innerProps={{
@@ -246,7 +246,7 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
           'stroke-width': 3
         }}
       />
-      <SmoothInterpolatingPath
+      <SmoothInterpolatingCurve
         xs={[0, ...xs, width]}
         ys={[tys[0], ...tys, ...tys.slice(-1)]}
         innerProps={{
