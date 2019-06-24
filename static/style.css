@@ -236,12 +236,14 @@ a {
   .sun-bar li {
     display: flex;
     justify-content: center;
+    position: relative;
     flex: 0 0;
     height: 1.2rem;
     overflow: hidden;
   }
   .sun-bar .uv span {
     display: inline-block;
+    position: relative;
     width: 1.2rem;
     height: 1.2rem;
     border-radius: 50%;
@@ -249,24 +251,45 @@ a {
     font-size: .8rem;
     background: #ddd;
   }
-  .sun-bar .uv.green span {
+  .sun-bar .uv.green span,
+  .sun-bar .uv.green::before {
     background: #9AD739;
   }
-  .sun-bar .uv.yellow span {
+  .sun-bar .uv.yellow span,
+  .sun-bar .uv.yellow::before {
     background: #FFDB1E;
   }
-  .sun-bar .uv.orange span {
+  .sun-bar .uv.orange span,
+  .sun-bar .uv.orange::before {
     background: #E48E1D;
     color: white;
   }
-  .sun-bar .uv.red span {
+  .sun-bar .uv.red span,
+  .sun-bar .uv.red::before {
     background: #D1361B;
     color: white;
   }
-  .sun-bar .uv.violet span {
+  .sun-bar .uv.violet span,
+  .sun-bar .uv.violet::before {
     background: #7E03AF;
     color: white;
   }
+  .sun-bar .uv.extendleft::before,
+  .sun-bar .uv.extendright::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 50%;
+    bottom: 0;
+    left: 50%;
+  }
+  .sun-bar .uv.extendleft::before {
+    left: 0;
+  }
+  .sun-bar .uv.extendright::before {
+    right: 0;
+}
 
 .cloud-bar {
     display: flex;

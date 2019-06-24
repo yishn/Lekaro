@@ -69,17 +69,23 @@ function NightBackground({columnWidth, width, nightColumns}) {
 }
 
 function SunBar({columnWidth, uvIndex}) {
+  let getColor = uv =>
+    uv == null || uv === 0 ? ''
+    : uv < 3 ? 'green'
+    : uv < 6 ? 'yellow'
+    : uv < 8 ? 'orange'
+    : uv < 11 ? 'red'
+    : 'violet'
+
   return <ol class="sun-bar">
-    {uvIndex.map(x =>
+    {uvIndex.map((x, i) =>
       <li
-        class={`uv ${
-          x == null || x === 0 ? ''
-          : x < 3 ? 'green'
-          : x < 6 ? 'yellow'
-          : x < 8 ? 'orange'
-          : x < 11 ? 'red'
-          : 'violet'
-        }`}
+        class={classnames(
+          'uv',
+          getColor(x),
+          i > 0 && getColor(x) === getColor(uvIndex[i - 1]) && 'extendleft',
+          i < uvIndex.length - 1 && getColor(x) === getColor(uvIndex[i + 1]) && 'extendright'
+        )}
         style={{
           flexBasis: columnWidth
         }}
