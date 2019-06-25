@@ -3,6 +3,37 @@ import * as time from '../time.js'
 import LocationInfo from './LocationInfo.js'
 import WeatherTimeline from './WeatherTimeline.js'
 
+const unitsData = {
+  'si': {
+    precipitation: {
+      intensity: 'mm/h',
+      accumulation: 'cm'
+    },
+    temperature: '°C',
+    apparentTemperature: '°C',
+    dewPoint: '°C',
+    windSpeed: 'm/s',
+    windGust: 'm/s',
+    ozone: 'DU',
+    pressure: 'hPa',
+    visibility: 'km'
+  },
+  'us': {
+    precipitation: {
+      intensity: 'iph',
+      accumulation: 'in'
+    },
+    temperature: '°F',
+    apparentTemperature: '°F',
+    dewPoint: '°F',
+    windSpeed: 'mph',
+    windGust: 'mph',
+    ozone: 'DU',
+    pressure: 'mb',
+    visibility: 'mi'
+  }
+}
+
 export default class App extends Component {
   get title() {
     let {city, state, country} = this.props.locationInfo.address || {}
@@ -39,7 +70,7 @@ export default class App extends Component {
   }
 
   render() {
-    let {loading, locationInfo, forecastData} = this.props
+    let {loading, locationInfo, forecastData, units} = this.props
 
     let getColumnFromTimestamp = timestamp => {
       if (timestamp < forecastData.hourly[0].time) return 0
@@ -76,6 +107,8 @@ export default class App extends Component {
 
       <div class="timeline-wrapper">
         <WeatherTimeline
+          units={unitsData[units]}
+          labels={hourLabels}
           nightColumns={
             forecastData.daily
             && forecastData.hourly
@@ -109,7 +142,6 @@ export default class App extends Component {
               }))
               .filter(({start, end}) => start !== end)
           }
-          labels={hourLabels}
           uvIndex={
             forecastData.hourly
             && forecastData.hourly.map(entry => entry.uvIndex)
