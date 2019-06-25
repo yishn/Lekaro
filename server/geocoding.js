@@ -1,10 +1,21 @@
 import request from 'request'
 
+let lastRequestTime = null
 let cache = {}
 
 async function nominatimRequest(path, options = {}) {
   let key = JSON.stringify([path, options])
   if (key in cache) return cache[key]
+
+  if (lastRequestTime != null) {
+    let deltaTime = new Date().getTime() - lastRequestTime.getTime()
+
+    if (deltaTime < 1000) {
+      await new Promise(resolve => setTimeout(resolve, 1000 - deltaTime))
+    }
+  }
+
+  lastRequestTime = new Date()
 
   console.log('info: Request Nominatim', path, options)
 
