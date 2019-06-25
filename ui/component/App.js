@@ -131,7 +131,10 @@ export default class App extends Component {
             && forecastData.hourly
             && forecastData.precipitation.map((entry, i) => ({
               x: i === 0 ? 0 : getColumnFromTimestamp(entry.time),
-              probability: entry.probability
+              intensity: entry.intensity,
+              accumulation: entry.accumulation,
+              probability: entry.probability,
+              type: entry.type
             }))
           }
         />

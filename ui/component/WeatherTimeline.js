@@ -121,22 +121,29 @@ function LabeledTicks({columnWidth, labels, showLabels, labelPosition, nightColu
   </ol>
 }
 
-function CloudBar({columnWidth, cloudCover}) {
-  let getCloudCoverDescription = cover =>
-    `${Math.round(cover * 100)}%: ${(
-      cover < .25 ? 'Clear'
-      : cover < .5 ? 'Partly Cloudy'
-      : cover < .75 ? 'Mostly Cloudy'
+function CloudBar({columnWidth, cloudCover, precipitation}) {
+  let percent = p => `${Math.round(p * 100)}%`
+  let capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase()
+
+  let getCloudCoverDescription = i => [
+    `${(
+      cloudCover[i] < .25 ? 'Clear'
+      : cloudCover[i] < .5 ? 'Partly Cloudy'
+      : cloudCover[i] < .75 ? 'Mostly Cloudy'
       : 'Overcast'
-    )}`
+    )}: ${percent(cloudCover[i])}`,
+
+    precipitation[i].probability && precipitation[i].type &&
+      `${capitalize(precipitation[i].type)} Probability: ${percent(precipitation[i].probability)}`,
+  ].filter(x => !!x).join('\n')
 
   return <ol class="cloud-bar" style={{width: cloudCover.length * columnWidth}}>
-    {cloudCover.map(cover =>
+    {cloudCover.map((cover, i) =>
       <li
         style={{flexBasis: columnWidth}}
-        title={getCloudCoverDescription(cover)}
+        title={getCloudCoverDescription(i)}
       >
-        <div class="cover" style={{opacity: cover}}>{getCloudCoverDescription(cover)}</div>
+        <div class="cover" style={{opacity: cover}}>{getCloudCoverDescription(i)}</div>
       </li>
     )}
   </ol>
@@ -351,6 +358,42 @@ export default class WeatherTimeline extends Component {
       <CloudBar
         columnWidth={columnWidth}
         cloudCover={cloudCover}
+        precipitation={
+          precipitation
+            .reduce((acc, entry) => {
+              let index = Math.floor(entry.x)
+
+              while (acc[index] == null) {
+                acc.push([])
+              }
+
+              acc[index].push(entry)
+              return acc
+            }, [])
+            .map(entries => {
+              let max = key => {
+                let result = Math.max(...entries.filter(x => x[key] != null).map(x => x[key]))
+                return isFinite(result) ? result : undefined
+              }
+
+              return {
+                intensity: max('intensity'),
+                accumulation: max('accumulation'),
+                probability: max('probability'),
+                type: (Object.entries(
+                  entries
+                  .filter(x => x.type != null)
+                  .map(x => x.type)
+                  .reduce((acc, type) => {
+                    acc[type] = (acc[type] || 0) + 1
+                    return acc
+                  }, {})
+                ).find(([_, count], __, arr) =>
+                  arr.every(([_, count2]) => count >= count2)
+                ) || {})[0]
+              }
+            })
+        }
       />
 
       <div class="graph" style={{width: columnWidth * labels.length, height: 200}}>
