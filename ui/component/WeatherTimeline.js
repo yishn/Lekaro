@@ -318,7 +318,7 @@ export default class WeatherTimeline extends Component {
   render() {
     let {
       columnWidth = 24,
-      labels = [],
+      ticksLabels = [],
       uvIndex = [],
       nightColumns = [],
       cloudCover = [],
@@ -327,7 +327,7 @@ export default class WeatherTimeline extends Component {
       precipitation = []
     } = this.props
 
-    let width = columnWidth * labels.length
+    let width = columnWidth * ticksLabels.length
 
     let graphProps = {
       columnWidth,
@@ -349,7 +349,7 @@ export default class WeatherTimeline extends Component {
 
       <LabeledTicks
         columnWidth={columnWidth}
-        labels={labels.map(_ => '')}
+        labels={ticksLabels.map(_ => '')}
         showLabels={false}
         labelPosition="top"
         nightColumns={nightColumns}
@@ -396,7 +396,7 @@ export default class WeatherTimeline extends Component {
         }
       />
 
-      <div class="graph" style={{width: columnWidth * labels.length, height: 200}}>
+      <div class="graph" style={{width: columnWidth * ticksLabels.length, height: 200}}>
         <PrecipitationGraph
           {...graphProps}
           precipitation={precipitation}
@@ -411,7 +411,7 @@ export default class WeatherTimeline extends Component {
 
       <LabeledTicks
         columnWidth={columnWidth}
-        labels={labels}
+        labels={ticksLabels}
         showLabels={true}
         labelPosition="bottom"
         nightColumns={nightColumns}

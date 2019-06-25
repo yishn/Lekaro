@@ -109,7 +109,7 @@ export default class App extends Component {
               }))
               .filter(({start, end}) => start !== end)
           }
-          labels={hourLabels}
+          ticksLabels={hourLabels}
           uvIndex={
             forecastData.hourly
             && forecastData.hourly.map(entry => entry.uvIndex)
