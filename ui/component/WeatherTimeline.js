@@ -149,14 +149,14 @@ function CloudBar({columnWidth, cloudCover, precipitation}) {
   </ol>
 }
 
-function PrecipitationGraph({columnWidth, width, height, precipitation}) {
+function PrecipitationGraph({columnWidth, graphHeight, width, precipitation}) {
   let xs = precipitation.map(entry => entry.x * columnWidth)
-  let ys = precipitation.map(entry => entry.probability * height)
+  let ys = precipitation.map(entry => entry.probability * graphHeight)
 
   return <div class="precipitation-graph">
     <svg
       width={width}
-      height={height}
+      height={graphHeight}
     >
       <SmoothInterpolatingCurve
         xs={[0, ...xs]}
@@ -171,7 +171,7 @@ function PrecipitationGraph({columnWidth, width, height, precipitation}) {
   </div>
 }
 
-function TemperatureGraph({columnWidth, width, height, temperature, apparentTemperature}) {
+function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparentTemperature}) {
   if (temperature.length === 0) return
 
   let min = Math.floor(Math.min(...temperature, ...apparentTemperature)) - 3
@@ -190,7 +190,7 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
   }
 
   let xs = temperature.map((_, i) => i * columnWidth + columnWidth / 2)
-  let getY = t => height * (min === max ? .5 : (max - t) / (max - min))
+  let getY = t => graphHeight * (min === max ? .5 : (max - t) / (max - min))
   let tys = temperature.map(getY)
   let atys = apparentTemperature.map(getY)
 
@@ -236,7 +236,7 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
   return <div class="temperature-graph">
     <svg
       width={width}
-      height={height}
+      height={graphHeight}
     >
       <g class="helperlines">
         {[...Array(helperLineCount)].map((_, i) =>
@@ -291,7 +291,7 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
               ? getY(Math.min(temperature[i], apparentTemperature[i]))
               : 'auto',
             bottom: position === 'top'
-              ? height - getY(Math.max(temperature[i], apparentTemperature[i]))
+              ? graphHeight - getY(Math.max(temperature[i], apparentTemperature[i]))
               : 'auto'
           }}
         >
@@ -314,11 +314,21 @@ function TemperatureGraph({columnWidth, width, height, temperature, apparentTemp
   </div>
 }
 
+function MainLabels({columnWidth, labels}) {
+  return <ol class="main-labels">
+    {labels.map(({x, type, label}) =>
+      <li class={type} style={{left: x * columnWidth}}>{label}</li>
+    )}
+  </ol>
+}
+
 export default class WeatherTimeline extends Component {
   render() {
     let {
       columnWidth = 24,
-      ticksLabels = [],
+      graphHeight = 200,
+      tickLabels = [],
+      labels = [],
       uvIndex = [],
       nightColumns = [],
       cloudCover = [],
@@ -327,11 +337,11 @@ export default class WeatherTimeline extends Component {
       precipitation = []
     } = this.props
 
-    let width = columnWidth * ticksLabels.length
+    let width = columnWidth * tickLabels.length
 
     let graphProps = {
       columnWidth,
-      height: 200,
+      graphHeight,
       width
     }
 
@@ -349,7 +359,7 @@ export default class WeatherTimeline extends Component {
 
       <LabeledTicks
         columnWidth={columnWidth}
-        labels={ticksLabels.map(_ => '')}
+        labels={tickLabels.map(_ => '')}
         showLabels={false}
         labelPosition="top"
         nightColumns={nightColumns}
@@ -396,7 +406,7 @@ export default class WeatherTimeline extends Component {
         }
       />
 
-      <div class="graph" style={{width: columnWidth * ticksLabels.length, height: 200}}>
+      <div class="graph" style={{width: columnWidth * tickLabels.length, height: 200}}>
         <PrecipitationGraph
           {...graphProps}
           precipitation={precipitation}
@@ -411,10 +421,15 @@ export default class WeatherTimeline extends Component {
 
       <LabeledTicks
         columnWidth={columnWidth}
-        labels={ticksLabels}
+        labels={tickLabels}
         showLabels={true}
         labelPosition="bottom"
         nightColumns={nightColumns}
+      />
+
+      <MainLabels
+        columnWidth={columnWidth}
+        labels={labels}
       />
     </div>
   }
