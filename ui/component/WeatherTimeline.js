@@ -121,21 +121,37 @@ function LabeledTicks({columnWidth, labels, showLabels, labelPosition, nightColu
   </ol>
 }
 
-function CloudBar({columnWidth, cloudCover, precipitation}) {
+function CloudBar({columnWidth, units, cloudCover, precipitation}) {
   let percent = p => `${Math.round(p * 100)}%`
   let capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase()
+  let round1 = x => Math.round(x * 10) / 10
 
-  let getCloudCoverDescription = i => [
-    `${(
-      cloudCover[i] < .25 ? 'Clear'
-      : cloudCover[i] < .5 ? 'Partly Cloudy'
-      : cloudCover[i] < .75 ? 'Mostly Cloudy'
-      : 'Overcast'
-    )}: ${percent(cloudCover[i])}`,
+  let getCloudCoverDescription = i => {
+    let {
+      probability: precipProbability,
+      intensity: precipIntensity,
+      accumulation: precipAccumulation,
+      type: precipType
+    } = precipitation[i]
 
-    precipitation[i].probability && precipitation[i].type &&
-      `${capitalize(precipitation[i].type)} Probability: ${percent(precipitation[i].probability)}`,
-  ].filter(x => !!x).join('\n')
+    return [
+      `${(
+        cloudCover[i] < .25 ? 'Clear'
+        : cloudCover[i] < .5 ? 'Partly Cloudy'
+        : cloudCover[i] < .75 ? 'Mostly Cloudy'
+        : 'Overcast'
+      )}: ${percent(cloudCover[i])}`,
+
+      precipProbability && precipType &&
+        `${capitalize(precipType)} Probability: ${percent(precipProbability)}`,
+
+      precipIntensity && round1(precipIntensity) > 0 && precipType &&
+        `${capitalize(precipType)} Intensity: ${round1(precipIntensity)} ${units.precipitation.intensity}`,
+
+      precipAccumulation && round1(precipAccumulation) > 0 && precipType &&
+        `${capitalize(precipType)} Accumulation: ${round1(precipAccumulation)} ${units.precipitation.accumulation}`
+    ].filter(x => !!x).join('\n')
+  }
 
   return <ol class="cloud-bar" style={{width: cloudCover.length * columnWidth}}>
     {cloudCover.map((cover, i) =>
@@ -319,6 +335,7 @@ export default class WeatherTimeline extends Component {
     let {
       columnWidth = 24,
       labels = [],
+      units = {precipitation: {}},
       uvIndex = [],
       nightColumns = [],
       cloudCover = [],
@@ -357,6 +374,7 @@ export default class WeatherTimeline extends Component {
 
       <CloudBar
         columnWidth={columnWidth}
+        units={units}
         cloudCover={cloudCover}
         precipitation={
           precipitation
