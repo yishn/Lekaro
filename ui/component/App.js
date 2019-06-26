@@ -48,7 +48,7 @@ export default class App extends Component {
   componentDidMount() {
     // Load forecast
 
-    this.actions.loadForecastFromURL()
+    this.actions.loadForecastFromURL({replaceHistory: true})
 
     // Handle events
 
@@ -70,7 +70,7 @@ export default class App extends Component {
   }
 
   render() {
-    let {loading, locationInfo, forecastData, units} = this.props
+    let {loading, error, locationInfo, forecastData, units} = this.props
 
     let getColumnFromTimestamp = timestamp => {
       if (timestamp < forecastData.hourly[0].time) return 0

@@ -132,7 +132,7 @@ function CloudBar({columnWidth, units, cloudCover, precipitation}) {
       intensity: precipIntensity,
       accumulation: precipAccumulation,
       type: precipType
-    } = precipitation[i]
+    } = precipitation[i] || {}
 
     return [
       `${(

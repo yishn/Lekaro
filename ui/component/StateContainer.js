@@ -25,7 +25,7 @@ export default class StateContainer extends Component {
     }
   }
 
-  loadForecast = async ({name, coordinates, pushHistory = true} = {}) => {
+  loadForecast = async ({name, coordinates, replaceHistory = false, pushHistory = true} = {}) => {
     this.setState({loading: true})
 
     if (name == null && coordinates == null) {
@@ -49,7 +49,9 @@ export default class StateContainer extends Component {
 
       let {info, forecast} = await response.json()
 
-      if (pushHistory) {
+      if (replaceHistory) {
+        history.replaceState(null, '', `#${info.coordinates.reverse().join(',')}`)
+      } else if (pushHistory) {
         history.pushState(null, '', `#${info.coordinates.reverse().join(',')}`)
       }
 
