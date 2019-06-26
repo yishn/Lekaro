@@ -67,14 +67,17 @@ export default class LocationInfo extends Component {
   }
 
   render() {
-    let {loading, state, country} = this.props
+    let {inputRef, loading, state, country} = this.props
 
     return <div class={classnames('location-info', {loading})}>
       <h2>
         <input
+          ref={inputRef}
+
           disabled={loading}
           value={this.state.input}
           placeholder="Location"
+          autofocus={!this.state.input}
 
           onInput={this.handleInputInput}
           onKeyDown={this.handleInputKeyDown}

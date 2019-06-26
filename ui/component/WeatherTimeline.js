@@ -166,6 +166,8 @@ function CloudBar({columnWidth, units, cloudCover, precipitation}) {
 }
 
 function PrecipitationGraph({columnWidth, graphHeight, width, precipitation}) {
+  if (precipitation.length === 0) return
+
   let xs = precipitation.map(entry => entry.x * columnWidth)
   let ys = precipitation.map(entry => entry.probability * graphHeight)
 
@@ -188,12 +190,12 @@ function PrecipitationGraph({columnWidth, graphHeight, width, precipitation}) {
 }
 
 function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparentTemperature}) {
-  if (temperature.length === 0) return
-
   let min = Math.floor(Math.min(...temperature, ...apparentTemperature)) - 3
   let max = Math.ceil(Math.max(...temperature, ...apparentTemperature)) + 3
   min = min - (min % 5 + 5) % 5
   max = max + 5 - (max % 5 + 5) % 5
+
+  if (isNaN(min) || isNaN(max)) return
 
   let helperLineStep = 5
   let helperLineCount = (max - min) / helperLineStep + 1
@@ -341,6 +343,7 @@ function MainLabels({columnWidth, labels}) {
 export default class WeatherTimeline extends Component {
   render() {
     let {
+      style = {},
       columnWidth = 24,
       graphHeight = 200,
       tickLabels = [],
@@ -362,7 +365,10 @@ export default class WeatherTimeline extends Component {
       width
     }
 
-    return <div class="weather-timeline" style={{boxSizing: 'content-box', width}}>
+    return <div
+      class="weather-timeline"
+      style={{...style, boxSizing: 'content-box', width}}
+    >
       <NightBackground
         columnWidth={columnWidth}
         width={width}
@@ -450,5 +456,37 @@ export default class WeatherTimeline extends Component {
         labels={labels}
       />
     </div>
+  }
+}
+
+export class WeatherTimelinePlaceholder extends Component {
+  render() {
+    let {
+      style,
+      columns = 7 * 24 + 6,
+      columnWidth,
+      graphHeight
+    } = this.props
+
+    let temperature = [...Array(columns)].map((_, i) =>
+      20 - 10 * Math.cos((i - 3) * 2 * Math.PI / 24)
+    )
+
+    return <WeatherTimeline
+      style={style}
+      columnWidth={columnWidth}
+      graphHeight={graphHeight}
+      tickLabels={[...Array(columns)].map(_ => '')}
+      nightColumns={[...Array(8)].map((_, i) => ({
+        start: i * 24,
+        end: 6 + i * 24,
+        moonPhase: 0
+      }))}
+      uvIndex={[...Array(columns)].map(_ => 0)}
+      cloudCover={[...Array(columns)].map(_ => 0)}
+      precipitation={[...Array(columns)].map((_, i) => ({x: i, probability: 0}))}
+      temperature={temperature.map(t => t - 3)}
+      apparentTemperature={temperature.map(t => t + 1)}
+    />
   }
 }

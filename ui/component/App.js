@@ -1,7 +1,7 @@
 import {h, Component} from 'preact'
 import * as time from '../time.js'
 import LocationInfo from './LocationInfo.js'
-import WeatherTimeline from './WeatherTimeline.js'
+import WeatherTimeline, { WeatherTimelinePlaceholder } from './WeatherTimeline.js'
 
 const unitsData = {
   'si': {
@@ -57,8 +57,12 @@ export default class App extends Component {
     })
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     document.title = this.title
+
+    if (prevProps.loading && !this.props.loading && this.props.error) {
+      this.inputElement.focus()
+    }
   }
 
   handleSearch = evt => {
@@ -146,54 +150,62 @@ export default class App extends Component {
       <h1>Lekaro Weather</h1>
 
       <LocationInfo
+        inputRef={el => this.inputElement = el}
+
         loading={loading}
-        city={locationInfo.address && locationInfo.address.city}
-        state={locationInfo.address && locationInfo.address.state}
-        country={locationInfo.address && locationInfo.address.country}
+        city={error ? '' : locationInfo.address && locationInfo.address.city}
+        state={error ? '' : locationInfo.address && locationInfo.address.state}
+        country={error ? '' : locationInfo.address && locationInfo.address.country}
 
         onSearch={this.handleSearch}
         onCurrentLocationClick={this.handleCurrentLocationClick}
       />
 
       <div class="timeline-wrapper">
-        <WeatherTimeline
-          units={unitsData[units]}
-          labels={dayLabels}
-          tickLabels={hourLabels}
-          nightColumns={nightColumns}
+        {!error &&
+          <WeatherTimeline
+            units={unitsData[units]}
+            labels={dayLabels}
+            tickLabels={hourLabels}
+            nightColumns={nightColumns}
 
-          uvIndex={
-            forecastData.hourly
-            && forecastData.hourly.map(entry => entry.uvIndex)
-          }
+            uvIndex={
+              forecastData.hourly
+              && forecastData.hourly.map(entry => entry.uvIndex)
+            }
 
-          cloudCover={
-            forecastData.hourly
-            && forecastData.hourly.map(entry => entry.cloudCover)
-          }
+            cloudCover={
+              forecastData.hourly
+              && forecastData.hourly.map(entry => entry.cloudCover)
+            }
 
-          temperature={
-            forecastData.hourly
-            && forecastData.hourly.map(entry => entry.temperature)
-          }
+            temperature={
+              forecastData.hourly
+              && forecastData.hourly.map(entry => entry.temperature)
+            }
 
-          apparentTemperature={
-            forecastData.hourly
-            && forecastData.hourly.map(entry => entry.apparentTemperature)
-          }
+            apparentTemperature={
+              forecastData.hourly
+              && forecastData.hourly.map(entry => entry.apparentTemperature)
+            }
 
-          precipitation={
-            forecastData.precipitation
-            && forecastData.hourly
-            && forecastData.precipitation.map((entry, i) => ({
-              x: i === 0 ? 0 : getColumnFromTimestamp(entry.time),
-              intensity: entry.intensity,
-              accumulation: entry.accumulation,
-              probability: entry.probability,
-              type: entry.type
-            }))
-          }
-        />
+            precipitation={
+              forecastData.precipitation
+              && forecastData.hourly
+              && forecastData.precipitation.map((entry, i) => ({
+                x: i === 0 ? 0 : getColumnFromTimestamp(entry.time),
+                intensity: entry.intensity,
+                accumulation: entry.accumulation,
+                probability: entry.probability,
+                type: entry.type
+              }))
+            }
+          />
+        }
+
+        {error &&
+          <WeatherTimelinePlaceholder style={{opacity: .5}}/>
+        }
       </div>
     </div>
   }
