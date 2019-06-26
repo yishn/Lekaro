@@ -351,7 +351,13 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
 function MainLabels({columnWidth, labels}) {
   return <ol class="main-labels">
     {labels.map(({x, type, label}) =>
-      <li class={type} style={{left: x * columnWidth}}>{label}</li>
+      <li
+        key={label}
+        class={type}
+        style={{transform: `translateX(${x * columnWidth}px)`}}
+      >
+        {label}
+      </li>
     )}
   </ol>
 }
