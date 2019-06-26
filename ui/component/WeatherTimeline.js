@@ -189,9 +189,9 @@ function PrecipitationGraph({columnWidth, graphHeight, width, precipitation}) {
   </div>
 }
 
-function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparentTemperature}) {
-  let min = Math.floor(Math.min(...temperature, ...apparentTemperature)) - 3
-  let max = Math.ceil(Math.max(...temperature, ...apparentTemperature)) + 3
+function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparentTemperature, dewPoint}) {
+  let min = Math.floor(Math.min(...temperature, ...apparentTemperature, ...dewPoint)) - 3
+  let max = Math.ceil(Math.max(...temperature, ...apparentTemperature, ...dewPoint)) + 3
   min = min - (min % 5 + 5) % 5
   max = max + 5 - (max % 5 + 5) % 5
 
@@ -208,7 +208,9 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
   }
 
   let xs = temperature.map((_, i) => i * columnWidth + columnWidth / 2)
+
   let getY = t => graphHeight * (min === max ? .5 : (max - t) / (max - min))
+  let dpys = dewPoint.map(getY)
   let tys = temperature.map(getY)
   let atys = apparentTemperature.map(getY)
 
@@ -270,6 +272,15 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
 
       <SmoothInterpolatingCurve
         xs={[0, ...xs, width]}
+        ys={[dpys[0], ...dpys, ...dpys.slice(-1)]}
+        innerProps={{
+          class: 'dewpoint',
+          fill: 'none',
+          'stroke-width': 3
+        }}
+      />
+      <SmoothInterpolatingCurve
+        xs={[0, ...xs, width]}
         ys={[atys[0], ...atys, ...atys.slice(-1)]}
         innerProps={{
           class: 'apparent',
@@ -289,10 +300,13 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
 
       {xs.map((x, i) => [
         <circle
+          class="dewpoint"
+          cx={x} cy={dpys[i]} r="4"
+        />,
+        <circle
           class="apparent"
           cx={x} cy={atys[i]} r="4"
         />,
-
         <circle
           class="temperature"
           cx={x} cy={tys[i]} r="4"
@@ -312,19 +326,20 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
               ? graphHeight - getY(Math.max(temperature[i], apparentTemperature[i]))
               : 'auto'
           }}
+          title={[
+            `Temperature: ${Math.round(temperature[i])}°`,
+            `Feels like ${Math.round(apparentTemperature[i])}°`,
+            `Dew Point: ${Math.round(dewPoint[i])}°`
+          ].join('\n')}
         >
           {apparentTemperature[i] - temperature[i] >= 1 && [
-            <em title={`Feels like ${Math.round(apparentTemperature[i])}°`}>
-              {Math.round(apparentTemperature[i])}°
-            </em>,
+            <em>{Math.round(apparentTemperature[i])}°</em>,
             <br/>
           ]}
           {Math.round(temperature[i])}°
           {temperature[i] - apparentTemperature[i] >= 1 && [
             <br/>,
-            <em title={`Feels like ${Math.round(apparentTemperature[i])}°`}>
-              {Math.round(apparentTemperature[i])}°
-            </em>
+            <em>{Math.round(apparentTemperature[i])}°</em>
           ]}
         </li>
       )}
@@ -354,6 +369,7 @@ export default class WeatherTimeline extends Component {
       cloudCover = [],
       temperature = [],
       apparentTemperature = [],
+      dewPoint = [],
       precipitation = []
     } = this.props
 
@@ -440,6 +456,7 @@ export default class WeatherTimeline extends Component {
           {...graphProps}
           temperature={temperature}
           apparentTemperature={apparentTemperature}
+          dewPoint={dewPoint}
         />
       </div>
 
@@ -487,6 +504,7 @@ export class WeatherTimelinePlaceholder extends Component {
       precipitation={[...Array(columns)].map((_, i) => ({x: i, probability: 0}))}
       temperature={temperature.map(t => t - 3)}
       apparentTemperature={temperature.map(t => t + 1)}
+      dewPoint={temperature.map(t => t - 7)}
     />
   }
 }

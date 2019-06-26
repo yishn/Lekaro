@@ -189,6 +189,11 @@ export default class App extends Component {
               && forecastData.hourly.map(entry => entry.apparentTemperature)
             }
 
+            dewPoint={
+              forecastData.hourly
+              && forecastData.hourly.map(entry => entry.dewPoint)
+            }
+
             precipitation={
               forecastData.precipitation
               && forecastData.hourly

@@ -11,7 +11,7 @@ body {
   --accent-color-2: #B43F5A;
   --accent-color-3: #4B1D37;
   --accent-color-4: #70575B;
-  --accent-color-5: #869B88;
+  --accent-color-5: #a3c1a6;
   --accent-color-6: #EC5E19;
   --accent-color-6-40: #E0A78C;
   --accent-color-7: #4579b9;
@@ -150,11 +150,17 @@ a {
 .temperature-graph .helperlines {
     stroke: #888;
   }
+  .temperature-graph path.dewpoint {
+    stroke: var(--accent-color-5);
+  }
   .temperature-graph path.apparent {
     stroke: var(--accent-color-6-40);
   }
   .temperature-graph path.temperature {
     stroke: var(--accent-color-6);
+  }
+  .temperature-graph circle.dewpoint {
+    fill: var(--accent-color-5);
   }
   .temperature-graph circle.apparent {
     fill: var(--accent-color-6-40);
