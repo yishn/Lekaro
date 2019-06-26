@@ -325,6 +325,7 @@ function MainLabels({columnWidth, labels}) {
 export default class WeatherTimeline extends Component {
   render() {
     let {
+      innerProps = {},
       columnWidth = 24,
       graphHeight = 200,
       tickLabels = [],
@@ -345,7 +346,11 @@ export default class WeatherTimeline extends Component {
       width
     }
 
-    return <div class="weather-timeline" style={{boxSizing: 'content-box', width}}>
+    return <div
+      innerProps={innerProps}
+      class="weather-timeline"
+      style={{boxSizing: 'content-box', width}}
+    >
       <NightBackground
         columnWidth={columnWidth}
         width={width}

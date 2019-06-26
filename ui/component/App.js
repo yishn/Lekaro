@@ -38,6 +38,14 @@ export default class App extends Component {
     this.actions.loadForecast()
   }
 
+  handleTimelineWrapperWheel = evt => {
+    if (evt.deltaY !== 0) {
+      evt.preventDefault()
+
+      evt.currentTarget.scrollLeft += evt.deltaY
+    }
+  }
+
   render() {
     let {loading, locationInfo, forecastData} = this.props
 
@@ -124,7 +132,7 @@ export default class App extends Component {
         onCurrentLocationClick={this.handleCurrentLocationClick}
       />
 
-      <div class="timeline-wrapper">
+      <div class="timeline-wrapper" onWheel={this.handleTimelineWrapperWheel}>
         <WeatherTimeline
           labels={dayLabels}
           tickLabels={hourLabels}
