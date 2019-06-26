@@ -5,13 +5,14 @@ import SmoothInterpolatingCurve from './SmoothInterpolatingCurve.js'
 function NightBackground({columnWidth, width, nightColumns}) {
   return <ol class="night-background">
     {nightColumns[0] && nightColumns[0].start === 0 &&
-      <li class="leftpadding"></li>
+      <li class="leftpadding" key="leftpadding"></li>
     }
 
-    {nightColumns.map(({start, end, moonPhase}) =>
+    {nightColumns.map(({start, end, moonPhase}, i) =>
       <li
+        key={i}
         style={{
-          left: start * columnWidth,
+          transform: `translateX(${start * columnWidth}px)`,
           width: (end - start) * columnWidth
         }}
       >
@@ -63,7 +64,7 @@ function NightBackground({columnWidth, width, nightColumns}) {
     )}
 
     {nightColumns.slice(-1)[0] && nightColumns.slice(-1)[0].end * columnWidth === width &&
-      <li class="rightpadding"></li>
+      <li class="rightpadding" key="righpadding"></li>
     }
   </ol>
 }
