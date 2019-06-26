@@ -83,14 +83,64 @@ export default class App extends Component {
       return column - 1 + dateTime.minute / 60
     }
 
-    let hourLabels = forecastData.hourly
-      && forecastData.hourly.map((entry, i) => {
+    let nightColumns = forecastData.daily && forecastData.hourly &&
+      [...forecastData.daily, null]
+      .map((entry, i, entries) => ({
+        moonPhase: (entries[i - 1] || entry).moonPhase,
+        ...(
+          entry == null ? {
+            start: getColumnFromTimestamp(
+              entries[i - 1] == null ? 0
+                : entries[i - 1].sunsetTime != null ? entries[i - 1].sunsetTime
+                : entries[i - 1].time
+            ),
+            end: forecastData.hourly.length
+          }
+          : (
+            entry.sunriseTime == null
+              ? [entry.time, (entries[i + 1] || {}).time || entry.time + 24 * 60 * 60]
+            : i === 0
+              ? [entry.time, entry.sunriseTime]
+            : entries[i - 1].sunsetTime != null
+              ? [entries[i - 1].sunsetTime, entry.sunriseTime]
+            : [entry.time, entry.sunriseTime]
+          )
+          .map(getColumnFromTimestamp)
+          .reduce((acc, x, i) => {
+            acc[i === 0 ? 'start' : 'end'] = x
+            return acc
+          }, {})
+        )
+      }))
+      .filter(({start, end}) => start !== end)
+
+    let hourLabels = forecastData.hourly &&
+      forecastData.hourly.map((entry, i) => {
         let hour = time.fromUnixTimestamp(entry.time, forecastData.timezone).toFormat('h')
 
         return i === 0 ? 'Now'
           : i === 1 || hour % 2 === 1 ? ''
           : hour
       })
+
+    let dayLabels = forecastData.daily &&
+      forecastData.daily
+      .map((entry, i) => i === 0 ? forecastData.hourly[0].time : entry.time)
+      .map(timestamp => time.fromUnixTimestamp(timestamp, forecastData.timezone))
+      .map(dateTime => {
+        let x = Math.floor(getColumnFromTimestamp(dateTime.toMillis() / 1000))
+
+        return {
+          x,
+          type: nightColumns.some(({start, end}) => start <= x && x <= end) ? 'night' : 'day',
+          label: dateTime.toFormat('cccc d')
+        }
+      })
+      .filter(({x}, i, arr) =>
+        i === 0 ? arr[i + 1] && arr[i + 1].x - x >= 6
+        : i === arr.length - 1 ? hourLabels.length - x >= 6
+        : true
+      )
 
     return <div class="lekaro-app">
       <h1>Lekaro Weather</h1>
@@ -108,56 +158,30 @@ export default class App extends Component {
       <div class="timeline-wrapper">
         <WeatherTimeline
           units={unitsData[units]}
-          labels={hourLabels}
-          nightColumns={
-            forecastData.daily
-            && forecastData.hourly
-            && [...forecastData.daily, null]
-              .map((entry, i, entries) => ({
-                moonPhase: (entries[i - 1] || entry).moonPhase,
-                ...(
-                  entry == null ? {
-                    start: getColumnFromTimestamp(
-                      entries[i - 1] == null ? 0
-                        : entries[i - 1].sunsetTime != null ? entries[i - 1].sunsetTime
-                        : entries[i - 1].time
-                    ),
-                    end: forecastData.hourly.length
-                  }
-                  : (
-                    entry.sunriseTime == null
-                      ? [entry.time, (entries[i + 1] || {}).time || entry.time + 24 * 60 * 60]
-                    : i === 0
-                      ? [entry.time, entry.sunriseTime]
-                    : entries[i - 1].sunsetTime != null
-                      ? [entries[i - 1].sunsetTime, entry.sunriseTime]
-                    : [entry.time, entry.sunriseTime]
-                  )
-                  .map(getColumnFromTimestamp)
-                  .reduce((acc, x, i) => {
-                    acc[i === 0 ? 'start' : 'end'] = x
-                    return acc
-                  }, {})
-                )
-              }))
-              .filter(({start, end}) => start !== end)
-          }
+          labels={dayLabels}
+          tickLabels={hourLabels}
+          nightColumns={nightColumns}
+
           uvIndex={
             forecastData.hourly
             && forecastData.hourly.map(entry => entry.uvIndex)
           }
+
           cloudCover={
             forecastData.hourly
             && forecastData.hourly.map(entry => entry.cloudCover)
           }
+
           temperature={
             forecastData.hourly
             && forecastData.hourly.map(entry => entry.temperature)
           }
+
           apparentTemperature={
             forecastData.hourly
             && forecastData.hourly.map(entry => entry.apparentTemperature)
           }
+
           precipitation={
             forecastData.precipitation
             && forecastData.hourly
