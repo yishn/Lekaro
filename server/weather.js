@@ -1,7 +1,12 @@
 import request from 'request'
 import config from '../config.js'
 
+let cache = {}
+
 async function darkSkyRequest(path, options = {}) {
+  let key = JSON.stringify([Math.round(new Date().getTime() / 1000 / 60), path, options])
+  if (key in cache) return cache[key]
+
   console.log('info: Request Dark Sky', path, options)
 
   return await new Promise((resolve, reject) => {
@@ -12,9 +17,15 @@ async function darkSkyRequest(path, options = {}) {
       json: true,
       gzip: true
     }, (err, response, body) => {
-      err != null ? reject(err)
-      : response.statusCode < 200 || response.statusCode >= 300 ? reject(new Error(body.error))
-      : resolve(body)
+      if (err != null) return reject(err)
+      if (response.statusCode < 200 || response.statusCode >= 300) return reject(new Error(body.error))
+
+      cache[key] = body
+      setTimeout(() => {
+        delete cache[key]
+      }, 60 * 1000)
+
+      resolve(body)
     })
   })
 }

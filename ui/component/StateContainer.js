@@ -6,8 +6,8 @@ export default class StateContainer extends Component {
     super(props)
 
     this.state = {
-      loading: true,
-      error: false,
+      loading: false,
+      error: true,
       locationInfo: {},
       forecastData: {},
       units: 'si'
@@ -18,14 +18,20 @@ export default class StateContainer extends Component {
     let {hash} = window.location
 
     if (hash != null && hash.length > 1) {
-      let coordinates = hash.slice(1).split(',').slice(0, 2).reverse()
-      this.loadForecast({coordinates, ...options})
+      if (hash.slice(1) === 'error') {
+        return this.setState({
+          error: true
+        })
+      } else {
+        let coordinates = hash.slice(1).split(',').slice(0, 2).reverse()
+        this.loadForecast({coordinates, ...options})
+      }
     } else {
       this.loadForecast(options)
     }
   }
 
-  loadForecast = async ({name, coordinates, pushHistory = true} = {}) => {
+  loadForecast = async ({name, coordinates, replaceHistory = false, pushHistory = true} = {}) => {
     this.setState({loading: true})
 
     if (name == null && coordinates == null) {
@@ -39,6 +45,9 @@ export default class StateContainer extends Component {
     }
 
     let enc = encodeURIComponent
+    let historyMethod = replaceHistory ? 'replaceState'
+      : pushHistory ? 'pushState'
+      : null
     let url = name != null
       ? `/forecast?name=${enc(name)}`
       : `/forecast?lat=${enc(coordinates[1])}&lon=${enc(coordinates[0])}`
@@ -49,8 +58,8 @@ export default class StateContainer extends Component {
 
       let {info, forecast} = await response.json()
 
-      if (pushHistory) {
-        history.pushState(null, '', `#${info.coordinates.reverse().join(',')}`)
+      if (historyMethod != null) {
+        history[historyMethod](null, '', `#${info.coordinates.reverse().join(',')}`)
       }
 
       this.setState({
@@ -60,6 +69,10 @@ export default class StateContainer extends Component {
         forecastData: forecast
       })
     } catch (err) {
+      if (historyMethod != null) {
+        history[historyMethod](null, '', `#error`)
+      }
+
       this.setState({
         loading: false,
         error: true

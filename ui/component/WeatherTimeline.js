@@ -5,13 +5,14 @@ import SmoothInterpolatingCurve from './SmoothInterpolatingCurve.js'
 function NightBackground({columnWidth, width, nightColumns}) {
   return <ol class="night-background">
     {nightColumns[0] && nightColumns[0].start === 0 &&
-      <li class="leftpadding"></li>
+      <li class="leftpadding" key="leftpadding"></li>
     }
 
-    {nightColumns.map(({start, end, moonPhase}) =>
+    {nightColumns.map(({start, end, moonPhase}, i) =>
       <li
+        key={i}
         style={{
-          left: start * columnWidth,
+          transform: `translateX(${start * columnWidth}px)`,
           width: (end - start) * columnWidth
         }}
       >
@@ -63,7 +64,7 @@ function NightBackground({columnWidth, width, nightColumns}) {
     )}
 
     {nightColumns.slice(-1)[0] && nightColumns.slice(-1)[0].end * columnWidth === width &&
-      <li class="rightpadding"></li>
+      <li class="rightpadding" key="righpadding"></li>
     }
   </ol>
 }
@@ -121,21 +122,37 @@ function LabeledTicks({columnWidth, labels, showLabels, labelPosition, nightColu
   </ol>
 }
 
-function CloudBar({columnWidth, cloudCover, precipitation}) {
+function CloudBar({columnWidth, units, cloudCover, precipitation}) {
   let percent = p => `${Math.round(p * 100)}%`
   let capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase()
+  let round1 = x => Math.round(x * 10) / 10
 
-  let getCloudCoverDescription = i => [
-    `${(
-      cloudCover[i] < .25 ? 'Clear'
-      : cloudCover[i] < .5 ? 'Partly Cloudy'
-      : cloudCover[i] < .75 ? 'Mostly Cloudy'
-      : 'Overcast'
-    )}: ${percent(cloudCover[i])}`,
+  let getCloudCoverDescription = i => {
+    let {
+      probability: precipProbability,
+      intensity: precipIntensity,
+      accumulation: precipAccumulation,
+      type: precipType
+    } = precipitation[i] || {}
 
-    precipitation[i].probability && precipitation[i].type &&
-      `${capitalize(precipitation[i].type)} Probability: ${percent(precipitation[i].probability)}`,
-  ].filter(x => !!x).join('\n')
+    return [
+      `${(
+        cloudCover[i] < .25 ? 'Clear'
+        : cloudCover[i] < .5 ? 'Partly Cloudy'
+        : cloudCover[i] < .75 ? 'Mostly Cloudy'
+        : 'Overcast'
+      )}: ${percent(cloudCover[i])}`,
+
+      precipProbability && precipType &&
+        `${capitalize(precipType)} Probability: ${percent(precipProbability)}`,
+
+      precipIntensity && round1(precipIntensity) > 0 && precipType &&
+        `${capitalize(precipType)} Intensity: ${round1(precipIntensity)} ${units.precipitation.intensity}`,
+
+      precipAccumulation && round1(precipAccumulation) > 0 && precipType &&
+        `${capitalize(precipType)} Accumulation: ${round1(precipAccumulation)} ${units.precipitation.accumulation}`
+    ].filter(x => !!x).join('\n')
+  }
 
   return <ol class="cloud-bar" style={{width: cloudCover.length * columnWidth}}>
     {cloudCover.map((cover, i) =>
@@ -150,6 +167,8 @@ function CloudBar({columnWidth, cloudCover, precipitation}) {
 }
 
 function PrecipitationGraph({columnWidth, graphHeight, width, precipitation}) {
+  if (precipitation.length === 0) return
+
   let xs = precipitation.map(entry => entry.x * columnWidth)
   let ys = precipitation.map(entry => entry.probability * graphHeight)
 
@@ -171,13 +190,13 @@ function PrecipitationGraph({columnWidth, graphHeight, width, precipitation}) {
   </div>
 }
 
-function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparentTemperature}) {
-  if (temperature.length === 0) return
-
-  let min = Math.floor(Math.min(...temperature, ...apparentTemperature)) - 3
-  let max = Math.ceil(Math.max(...temperature, ...apparentTemperature)) + 3
+function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparentTemperature, dewPoint}) {
+  let min = Math.floor(Math.min(...temperature, ...apparentTemperature, ...dewPoint)) - 3
+  let max = Math.ceil(Math.max(...temperature, ...apparentTemperature, ...dewPoint)) + 3
   min = min - (min % 5 + 5) % 5
   max = max + 5 - (max % 5 + 5) % 5
+
+  if (isNaN(min) || isNaN(max)) return
 
   let helperLineStep = 5
   let helperLineCount = (max - min) / helperLineStep + 1
@@ -190,7 +209,9 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
   }
 
   let xs = temperature.map((_, i) => i * columnWidth + columnWidth / 2)
+
   let getY = t => graphHeight * (min === max ? .5 : (max - t) / (max - min))
+  let dpys = dewPoint.map(getY)
   let tys = temperature.map(getY)
   let atys = apparentTemperature.map(getY)
 
@@ -252,6 +273,15 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
 
       <SmoothInterpolatingCurve
         xs={[0, ...xs, width]}
+        ys={[dpys[0], ...dpys, ...dpys.slice(-1)]}
+        innerProps={{
+          class: 'dewpoint',
+          fill: 'none',
+          'stroke-width': 3
+        }}
+      />
+      <SmoothInterpolatingCurve
+        xs={[0, ...xs, width]}
         ys={[atys[0], ...atys, ...atys.slice(-1)]}
         innerProps={{
           class: 'apparent',
@@ -271,10 +301,13 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
 
       {xs.map((x, i) => [
         <circle
+          class="dewpoint"
+          cx={x} cy={dpys[i]} r="4"
+        />,
+        <circle
           class="apparent"
           cx={x} cy={atys[i]} r="4"
         />,
-
         <circle
           class="temperature"
           cx={x} cy={tys[i]} r="4"
@@ -294,19 +327,20 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
               ? graphHeight - getY(Math.max(temperature[i], apparentTemperature[i]))
               : 'auto'
           }}
+          title={[
+            `Temperature: ${Math.round(temperature[i])}°`,
+            `Feels like ${Math.round(apparentTemperature[i])}°`,
+            `Dew Point: ${Math.round(dewPoint[i])}°`
+          ].join('\n')}
         >
           {apparentTemperature[i] - temperature[i] >= 1 && [
-            <em title={`Feels like ${Math.round(apparentTemperature[i])}°`}>
-              {Math.round(apparentTemperature[i])}°
-            </em>,
+            <em>{Math.round(apparentTemperature[i])}°</em>,
             <br/>
           ]}
           {Math.round(temperature[i])}°
           {temperature[i] - apparentTemperature[i] >= 1 && [
             <br/>,
-            <em title={`Feels like ${Math.round(apparentTemperature[i])}°`}>
-              {Math.round(apparentTemperature[i])}°
-            </em>
+            <em>{Math.round(apparentTemperature[i])}°</em>
           ]}
         </li>
       )}
@@ -326,15 +360,18 @@ export default class WeatherTimeline extends Component {
   render() {
     let {
       innerProps = {},
+      style = {},
       columnWidth = 24,
       graphHeight = 200,
       tickLabels = [],
       labels = [],
+      units = {precipitation: {}},
       uvIndex = [],
       nightColumns = [],
       cloudCover = [],
       temperature = [],
       apparentTemperature = [],
+      dewPoint = [],
       precipitation = []
     } = this.props
 
@@ -347,9 +384,9 @@ export default class WeatherTimeline extends Component {
     }
 
     return <div
-      innerProps={innerProps}
+      {...innerProps}
       class="weather-timeline"
-      style={{boxSizing: 'content-box', width}}
+      style={{...style, boxSizing: 'content-box', width}}
     >
       <NightBackground
         columnWidth={columnWidth}
@@ -372,6 +409,7 @@ export default class WeatherTimeline extends Component {
 
       <CloudBar
         columnWidth={columnWidth}
+        units={units}
         cloudCover={cloudCover}
         precipitation={
           precipitation
@@ -421,6 +459,7 @@ export default class WeatherTimeline extends Component {
           {...graphProps}
           temperature={temperature}
           apparentTemperature={apparentTemperature}
+          dewPoint={dewPoint}
         />
       </div>
 
@@ -437,5 +476,38 @@ export default class WeatherTimeline extends Component {
         labels={labels}
       />
     </div>
+  }
+}
+
+export class WeatherTimelinePlaceholder extends Component {
+  render() {
+    let {
+      style,
+      columns = 7 * 24 + 6,
+      columnWidth,
+      graphHeight
+    } = this.props
+
+    let temperature = [...Array(columns)].map((_, i) =>
+      20 - 10 * Math.cos((i - 3) * 2 * Math.PI / 24)
+    )
+
+    return <WeatherTimeline
+      style={style}
+      columnWidth={columnWidth}
+      graphHeight={graphHeight}
+      tickLabels={[...Array(columns)].map(_ => '')}
+      nightColumns={[...Array(8)].map((_, i) => ({
+        start: i * 24,
+        end: 6 + i * 24,
+        moonPhase: 0
+      }))}
+      uvIndex={[...Array(columns)].map(_ => 0)}
+      cloudCover={[...Array(columns)].map(_ => 0)}
+      precipitation={[...Array(columns)].map((_, i) => ({x: i, probability: 0}))}
+      temperature={temperature.map(t => t - 3)}
+      apparentTemperature={temperature.map(t => t + 1)}
+      dewPoint={temperature.map(t => t - 7)}
+    />
   }
 }
