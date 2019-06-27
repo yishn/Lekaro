@@ -224,7 +224,7 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
   let min = Math.floor(Math.min(...temperature, ...apparentTemperature, ...dewPoint)) - 3
   let max = Math.ceil(Math.max(...temperature, ...apparentTemperature, ...dewPoint)) + 3
   min = min - (min % 5 + 5) % 5
-  max = max + 5 - (max % 5 + 5) % 5
+  max = max + (5 - (max % 5 + 5) % 5) % 5
 
   if (isNaN(min) || isNaN(max)) return
 
@@ -234,7 +234,7 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
   while (helperLineCount >= 7) {
     helperLineStep += 5
     min = min - (min % helperLineStep + helperLineStep) % helperLineStep
-    max = max + helperLineStep - (max % helperLineStep + helperLineStep) % helperLineStep
+    max = max + (helperLineStep - (max % helperLineStep + helperLineStep) % helperLineStep) % helperLineStep
     helperLineCount = (max - min) / helperLineStep + 1
   }
 
@@ -332,15 +332,18 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
       {xs.map((x, i) => [
         <circle
           class="dewpoint"
-          cx={x} cy={dpys[i]} r="4"
+          style={{transform: `translate(${x}px, ${dpys[i]}px)`}}
+          cx={0} cy={0} r="4"
         />,
         <circle
           class="apparent"
-          cx={x} cy={atys[i]} r="4"
+          style={{transform: `translate(${x}px, ${atys[i]}px)`}}
+          cx={0} cy={0} r="4"
         />,
         <circle
           class="temperature"
-          cx={x} cy={tys[i]} r="4"
+          style={{transform: `translate(${x}px, ${tys[i]}px)`}}
+          cx={0} cy={0} r="4"
         />
       ])}
     </svg>
