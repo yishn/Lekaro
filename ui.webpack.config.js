@@ -32,7 +32,7 @@ module.exports = (env, argv) => ({
 
   resolve: {
     alias: {
-      react: 'preact'
+      react: path.join(__dirname, 'misc', 'react-shim.js')
     }
   }
 })

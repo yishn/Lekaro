@@ -98,6 +98,13 @@ export default class App extends Component {
     let nightColumns = forecastData.daily && forecastData.hourly &&
       [...forecastData.daily, null]
       .map((entry, i, entries) => ({
+        key: time.fromUnixTimestamp(
+          entries[i - 1] != null ? entries[i - 1].time
+            : entry != null ? entry.time - 24 * 60 * 60
+            : 0,
+          forecastData.timezone
+        ).toFormat('DDD'),
+
         moonPhase: (entries[i - 1] || entry).moonPhase,
         ...(
           entry == null ? {
@@ -143,6 +150,7 @@ export default class App extends Component {
         let x = Math.floor(getColumnFromTimestamp(dateTime.toMillis() / 1000))
 
         return {
+          key: dateTime.toFormat('DDD'),
           x,
           type: nightColumns.some(({start, end}) => start <= x && x <= end) ? 'night' : 'day',
           label: dateTime.toFormat('cccc d')

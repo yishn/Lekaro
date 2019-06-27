@@ -8,12 +8,12 @@ function NightBackground({columnWidth, width, nightColumns}) {
       <li class="leftpadding" key="leftpadding"></li>
     }
 
-    {nightColumns.map(({start, end, moonPhase}, i) =>
+    {nightColumns.map(({key, start, end, moonPhase}) =>
       <li
-        key={i}
+        key={key}
         style={{
-          transform: `translateX(${start * columnWidth}px)`,
-          width: (end - start) * columnWidth
+          transform: `translateX(${Math.round(start * columnWidth)}px)`,
+          width: Math.ceil((end - start) * columnWidth)
         }}
       >
         {moonPhase != null && end - start >= 1 &&
@@ -350,9 +350,9 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
 
 function MainLabels({columnWidth, labels}) {
   return <ol class="main-labels">
-    {labels.map(({x, type, label}) =>
+    {labels.map(({key, x, type, label}) =>
       <li
-        key={label}
+        key={key}
         class={type}
         style={{transform: `translateX(${x * columnWidth}px)`}}
       >

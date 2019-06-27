@@ -126,6 +126,7 @@ a {
     width: .5rem;
   }
   .night-background .rightpadding {
+    left: auto;
     right: -.5rem;
     width: .5rem;
   }
