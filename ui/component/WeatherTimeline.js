@@ -1,6 +1,36 @@
 import {h, Component} from 'preact'
 import classnames from 'classnames'
 import SmoothInterpolatingCurve from './SmoothInterpolatingCurve.js'
+import * as time from '../time.js';
+
+export function getPlaceholderProps({columns = 7 * 24 + 6} = {}) {
+  let now = Math.round(new Date().getTime() / 1000)
+  let columnArray = [...Array(columns)].map((_, i) => i)
+  let timeArray = columnArray.map(i => time.fromUnixTimestamp(now + i * 60 * 60))
+  let temperature = columnArray.map(i =>
+    20 - 10 * Math.cos((i - 3) * 2 * Math.PI / 24)
+  )
+
+  return {
+    columns: 7 * 24 + 6,
+    tickLabels: columnArray.map(_ => ''),
+    nightColumns: [...Array(8)].map((_, i) => ({
+      key: timeArray[i * 24] && timeArray[i * 24].toFormat('DDD'),
+      start: i * 24,
+      end: 6 + i * 24,
+      moonPhase: 0
+    })),
+    uvIndex: columnArray.map(_ => 0),
+    cloudCover: columnArray.map(_ => 0),
+    precipitation: columnArray.map(i => ({
+      x: i,
+      probability: 0
+    })),
+    temperature: temperature.map(t => t - 3),
+    apparentTemperature: temperature.map(t => t + 1),
+    dewPoint: temperature.map(t => t - 7)
+  }
+}
 
 function NightBackground({columnWidth, width, nightColumns}) {
   return <ol class="night-background">
@@ -482,38 +512,5 @@ export default class WeatherTimeline extends Component {
         labels={labels}
       />
     </div>
-  }
-}
-
-export class WeatherTimelinePlaceholder extends Component {
-  render() {
-    let {
-      style,
-      columns = 7 * 24 + 6,
-      columnWidth,
-      graphHeight
-    } = this.props
-
-    let temperature = [...Array(columns)].map((_, i) =>
-      20 - 10 * Math.cos((i - 3) * 2 * Math.PI / 24)
-    )
-
-    return <WeatherTimeline
-      style={style}
-      columnWidth={columnWidth}
-      graphHeight={graphHeight}
-      tickLabels={[...Array(columns)].map(_ => '')}
-      nightColumns={[...Array(8)].map((_, i) => ({
-        start: i * 24,
-        end: 6 + i * 24,
-        moonPhase: 0
-      }))}
-      uvIndex={[...Array(columns)].map(_ => 0)}
-      cloudCover={[...Array(columns)].map(_ => 0)}
-      precipitation={[...Array(columns)].map((_, i) => ({x: i, probability: 0}))}
-      temperature={temperature.map(t => t - 3)}
-      apparentTemperature={temperature.map(t => t + 1)}
-      dewPoint={temperature.map(t => t - 7)}
-    />
   }
 }

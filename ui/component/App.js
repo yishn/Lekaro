@@ -1,7 +1,7 @@
 import {h, Component} from 'preact'
 import * as time from '../time.js'
 import LocationInfo from './LocationInfo.js'
-import WeatherTimeline, { WeatherTimelinePlaceholder } from './WeatherTimeline.js'
+import WeatherTimeline, { getPlaceholderProps } from './WeatherTimeline.js'
 
 const unitsData = {
   'si': {
@@ -178,8 +178,7 @@ export default class App extends Component {
       />
 
       <div class="timeline-wrapper" onWheel={this.handleTimelineWrapperWheel}>
-        {!error &&
-          <WeatherTimeline
+        {!error ? <WeatherTimeline
             units={unitsData[units]}
             labels={dayLabels}
             tickLabels={hourLabels}
@@ -222,10 +221,7 @@ export default class App extends Component {
               }))
             }
           />
-        }
-
-        {error &&
-          <WeatherTimelinePlaceholder style={{opacity: .5}}/>
+          : <WeatherTimeline {...getPlaceholderProps()} style={{opacity: .5}}/>
         }
       </div>
     </div>
