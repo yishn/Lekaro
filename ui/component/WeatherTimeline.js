@@ -404,6 +404,7 @@ export default class WeatherTimeline extends Component {
       style = {},
       columnWidth = 24,
       graphHeight = 200,
+      selectedColumn = null,
       tickLabels = [],
       labels = [],
       units = {precipitation: {}},
@@ -516,6 +517,16 @@ export default class WeatherTimeline extends Component {
         columnWidth={columnWidth}
         labels={labels}
       />
+
+      {selectedColumn != null &&
+        <div
+          class="selected"
+          style={{
+            width: columnWidth,
+            transform: `translateX(${columnWidth * selectedColumn})`
+          }}
+        />
+      }
     </div>
   }
 }

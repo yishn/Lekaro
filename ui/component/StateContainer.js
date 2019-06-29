@@ -10,7 +10,8 @@ export default class StateContainer extends Component {
       error: true,
       locationInfo: {},
       forecastData: {},
-      units: 'si'
+      units: 'si',
+      selectedTime: Math.round(new Date().getTime() / 1000)
     }
   }
 
@@ -78,6 +79,16 @@ export default class StateContainer extends Component {
         error: true
       })
     }
+  }
+
+  selectTime = timestamp => {
+    this.setState({
+      selectedTime: timestamp
+    })
+  }
+
+  selectUnits = units => {
+    this.setState({units})
   }
 
   render() {

@@ -102,6 +102,15 @@ a {
   }
   .weather-timeline .graph {
     position: relative;
+  }
+  .weather-timeline .selected {
+    position: absolute;
+    top: 0;
+    left: .5rem;
+    bottom: 0;
+    background: var(--accent-color-2);
+    opacity: .15;
+    transition: transform .2s;
 }
 
 .night-background {

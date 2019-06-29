@@ -82,7 +82,7 @@ export default class App extends Component {
   }
 
   render() {
-    let {loading, error, locationInfo, forecastData, units} = this.props
+    let {loading, error, locationInfo, forecastData, units, selectedTime} = this.props
 
     let getColumnFromTimestamp = timestamp => {
       if (timestamp < forecastData.hourly[0].time) return 0
@@ -179,50 +179,50 @@ export default class App extends Component {
 
       <div class="timeline-wrapper" onWheel={this.handleTimelineWrapperWheel}>
         {!error ? <WeatherTimeline
-            units={unitsData[units]}
-            labels={dayLabels}
-            tickLabels={hourLabels}
-            nightColumns={nightColumns}
+          units={unitsData[units]}
+          labels={dayLabels}
+          selectedColumn={getColumnFromTimestamp(selectedTime)}
+          tickLabels={hourLabels}
+          nightColumns={nightColumns}
 
-            uvIndex={
-              forecastData.hourly
-              && forecastData.hourly.map(entry => entry.uvIndex)
-            }
+          uvIndex={
+            forecastData.hourly
+            && forecastData.hourly.map(entry => entry.uvIndex)
+          }
 
-            cloudCover={
-              forecastData.hourly
-              && forecastData.hourly.map(entry => entry.cloudCover)
-            }
+          cloudCover={
+            forecastData.hourly
+            && forecastData.hourly.map(entry => entry.cloudCover)
+          }
 
-            temperature={
-              forecastData.hourly
-              && forecastData.hourly.map(entry => entry.temperature)
-            }
+          temperature={
+            forecastData.hourly
+            && forecastData.hourly.map(entry => entry.temperature)
+          }
 
-            apparentTemperature={
-              forecastData.hourly
-              && forecastData.hourly.map(entry => entry.apparentTemperature)
-            }
+          apparentTemperature={
+            forecastData.hourly
+            && forecastData.hourly.map(entry => entry.apparentTemperature)
+          }
 
-            dewPoint={
-              forecastData.hourly
-              && forecastData.hourly.map(entry => entry.dewPoint)
-            }
+          dewPoint={
+            forecastData.hourly
+            && forecastData.hourly.map(entry => entry.dewPoint)
+          }
 
-            precipitation={
-              forecastData.precipitation
-              && forecastData.hourly
-              && forecastData.precipitation.map((entry, i) => ({
-                x: i === 0 ? 0 : getColumnFromTimestamp(entry.time),
-                intensity: entry.intensity,
-                accumulation: entry.accumulation,
-                probability: entry.probability,
-                type: entry.type
-              }))
-            }
-          />
-          : <WeatherTimeline {...getPlaceholderProps()} style={{opacity: .5}}/>
-        }
+          precipitation={
+            forecastData.precipitation
+            && forecastData.hourly
+            && forecastData.precipitation.map((entry, i) => ({
+              x: i === 0 ? 0 : getColumnFromTimestamp(entry.time),
+              intensity: entry.intensity,
+              accumulation: entry.accumulation,
+              probability: entry.probability,
+              type: entry.type
+            }))
+          }
+        />
+        : <WeatherTimeline {...getPlaceholderProps()} style={{opacity: .5}}/>}
       </div>
     </div>
   }
