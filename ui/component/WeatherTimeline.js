@@ -398,6 +398,27 @@ function MainLabels({columnWidth, labels}) {
 }
 
 export default class WeatherTimeline extends Component {
+  handleMouseDown = evt => {
+    if (evt.buttons === 1) {
+      evt.preventDefault()
+
+      let {columnWidth = 24, tickLabels = []} = this.props
+      let {left} = this.element.getBoundingClientRect()
+      let paddingLeft = this.element.querySelector('.graph').offsetLeft
+      let column = Math.floor((evt.clientX - left - paddingLeft) / columnWidth)
+
+      if (
+        column !== this.props.selectedColumn
+        && column >= 0
+        && column < tickLabels.length
+      ) {
+        let {onColumnClick = () => {}} = this.props
+
+        onColumnClick({column})
+      }
+    }
+  }
+
   render() {
     let {
       innerProps = {},
@@ -427,8 +448,12 @@ export default class WeatherTimeline extends Component {
 
     return <div
       {...innerProps}
+      ref={el => (this.element = el, innerProps.ref && innerProps.ref(el))}
       class="weather-timeline"
       style={{...style, boxSizing: 'content-box', width}}
+
+      onMouseMove={this.handleMouseDown}
+      onMouseDown={this.handleMouseDown}
     >
       <NightBackground
         columnWidth={columnWidth}
@@ -523,7 +548,7 @@ export default class WeatherTimeline extends Component {
           class="selected"
           style={{
             width: columnWidth,
-            transform: `translateX(${columnWidth * selectedColumn})`
+            transform: `translateX(${columnWidth * selectedColumn}px)`
           }}
         />
       }

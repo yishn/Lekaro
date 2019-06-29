@@ -81,11 +81,17 @@ export default class App extends Component {
     }
   }
 
+  handleColumnClick = evt => {
+    let {forecastData} = this.props
+
+    this.actions.selectTime(forecastData.hourly[evt.column].time)
+  }
+
   render() {
     let {loading, error, locationInfo, forecastData, units, selectedTime} = this.props
 
     let getColumnFromTimestamp = timestamp => {
-      if (timestamp < forecastData.hourly[0].time) return 0
+      if (!forecastData.hourly || timestamp < forecastData.hourly[0].time) return 0
       if (timestamp > forecastData.hourly.slice(-1)[0].time) return forecastData.hourly.length
 
       let dateTime = time.fromUnixTimestamp(timestamp, forecastData.timezone)
@@ -179,9 +185,9 @@ export default class App extends Component {
 
       <div class="timeline-wrapper" onWheel={this.handleTimelineWrapperWheel}>
         {!error ? <WeatherTimeline
+          selectedColumn={Math.floor(getColumnFromTimestamp(selectedTime))}
           units={unitsData[units]}
           labels={dayLabels}
-          selectedColumn={getColumnFromTimestamp(selectedTime)}
           tickLabels={hourLabels}
           nightColumns={nightColumns}
 
@@ -221,6 +227,8 @@ export default class App extends Component {
               type: entry.type
             }))
           }
+
+          onColumnClick={this.handleColumnClick}
         />
         : <WeatherTimeline {...getPlaceholderProps()} style={{opacity: .5}}/>}
       </div>
