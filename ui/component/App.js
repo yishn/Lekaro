@@ -1,7 +1,9 @@
 import {h, Component} from 'preact'
+import {Duration} from 'luxon'
 import * as time from '../time.js'
 import LocationInfo from './LocationInfo.js'
 import WeatherTimeline, { getPlaceholderProps } from './WeatherTimeline.js'
+import WeatherDetails from './WeatherDetails.js';
 
 const unitsData = {
   'si': {
@@ -90,25 +92,38 @@ export default class App extends Component {
   render() {
     let {loading, error, locationInfo, forecastData, units, selectedTime} = this.props
 
-    let getColumnFromTimestamp = timestamp => {
+    let getColumnFromTimestamp = (timestamp, precise = false) => {
       if (!forecastData.hourly || timestamp < forecastData.hourly[0].time) return 0
       if (timestamp > forecastData.hourly.slice(-1)[0].time) return forecastData.hourly.length
 
-      let dateTime = time.fromUnixTimestamp(timestamp, forecastData.timezone)
       let column = forecastData.hourly.findIndex(y => timestamp < y.time)
       if (column < 0) column = forecastData.hourly.length
 
-      return column - 1 + dateTime.minute / 60
+      let minute = 0
+
+      if (precise) {
+        let date = new Date(timestamp * 1000)
+        minute = date.getMinutes()
     }
+
+      return column - 1 + minute / 60
+    }
+
+    let hourlyTimes = forecastData.hourly && forecastData.hourly.map(entry =>
+      time.fromUnixTimestamp(entry.time, forecastData.timezone)
+    )
+
+    let dailyTimes = forecastData.daily && forecastData.daily.map(entry =>
+      time.fromUnixTimestamp(entry.time, forecastData.timezone)
+    )
 
     let nightColumns = forecastData.daily && forecastData.hourly &&
       [...forecastData.daily, null]
       .map((entry, i, entries) => ({
-        key: time.fromUnixTimestamp(
-          entries[i - 1] != null ? entries[i - 1].time
-            : entry != null ? entry.time - 24 * 60 * 60
-            : 0,
-          forecastData.timezone
+        key: (
+          entries[i - 1] != null ? dailyTimes[i - 1]
+          : entry != null ? dailyTimes[i].minus(Duration.fromObject({days: 1}))
+          : 0
         ).toFormat('DDD'),
 
         moonPhase: (entries[i - 1] || entry).moonPhase,
@@ -117,7 +132,8 @@ export default class App extends Component {
             start: getColumnFromTimestamp(
               entries[i - 1] == null ? 0
                 : entries[i - 1].sunsetTime != null ? entries[i - 1].sunsetTime
-                : entries[i - 1].time
+                : entries[i - 1].time,
+              true
             ),
             end: forecastData.hourly.length
           }
@@ -130,7 +146,7 @@ export default class App extends Component {
               ? [entries[i - 1].sunsetTime, entry.sunriseTime]
             : [entry.time, entry.sunriseTime]
           )
-          .map(getColumnFromTimestamp)
+          .map(timestamp => getColumnFromTimestamp(timestamp, true))
           .reduce((acc, x, i) => {
             acc[i === 0 ? 'start' : 'end'] = x
             return acc
@@ -140,20 +156,18 @@ export default class App extends Component {
       .filter(({start, end}) => start !== end)
 
     let hourLabels = forecastData.hourly &&
-      forecastData.hourly.map((entry, i) => {
-        let hour = time.fromUnixTimestamp(entry.time, forecastData.timezone).toFormat('h')
+      forecastData.hourly.map((_, i) => {
+        if (i === 0) return 'Now'
 
-        return i === 0 ? 'Now'
-          : i === 1 || hour % 2 === 1 ? ''
-          : hour
+        let hour = hourlyTimes[i].toFormat('h')
+        return i === 1 || hour % 2 === 1 ? '' : hour
       })
 
-    let dayLabels = forecastData.daily &&
-      forecastData.daily
-      .map((entry, i) => i === 0 ? forecastData.hourly[0].time : entry.time)
-      .map(timestamp => time.fromUnixTimestamp(timestamp, forecastData.timezone))
+    let dayLabels = dailyTimes &&
+      dailyTimes
+      .map((t, i) => i === 0 ? hourlyTimes[0] : t)
       .map(dateTime => {
-        let x = Math.floor(getColumnFromTimestamp(dateTime.toMillis() / 1000))
+        let x = getColumnFromTimestamp(dateTime.toMillis() / 1000)
 
         return {
           key: dateTime.toFormat('DDD'),
@@ -167,6 +181,9 @@ export default class App extends Component {
         : i === arr.length - 1 ? hourLabels.length - x >= 6
         : true
       )
+
+    let selectedColumn = getColumnFromTimestamp(selectedTime)
+    let selectedHour = forecastData.hourly && forecastData.hourly[selectedColumn]
 
     return <div class="lekaro-app">
       <h1>Lekaro Weather</h1>
@@ -185,7 +202,7 @@ export default class App extends Component {
 
       <div class="timeline-wrapper" onWheel={this.handleTimelineWrapperWheel}>
         {!error ? <WeatherTimeline
-          selectedColumn={Math.floor(getColumnFromTimestamp(selectedTime))}
+          selectedColumn={selectedColumn}
           units={unitsData[units]}
           labels={dayLabels}
           tickLabels={hourLabels}
@@ -220,7 +237,7 @@ export default class App extends Component {
             forecastData.precipitation
             && forecastData.hourly
             && forecastData.precipitation.map((entry, i) => ({
-              x: i === 0 ? 0 : getColumnFromTimestamp(entry.time),
+              x: i === 0 ? 0 : getColumnFromTimestamp(entry.time, true),
               intensity: entry.intensity,
               accumulation: entry.accumulation,
               probability: entry.probability,

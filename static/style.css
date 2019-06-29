@@ -110,7 +110,7 @@ a {
     bottom: 0;
     background: var(--accent-color-2);
     opacity: .3;
-    /* transition: transform .1s; */
+    transition: transform .1s;
     pointer-events: none;
 }
 

@@ -10,9 +10,8 @@ export function supportsTimezone(timezone) {
 }
 
 export function fromUnixTimestamp(timestamp, timezone = null) {
-  if (timezone != null && !supportsTimezone(timezone)) {
-    timezone = null
-  }
+  let time = DateTime.fromSeconds(timestamp, {zone: timezone})
+  if (time.invalid != null) return DateTime.fromSeconds(timestamp)
 
-  return DateTime.fromSeconds(timestamp, {zone: timezone})
+  return time
 }
