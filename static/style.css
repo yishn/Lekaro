@@ -366,3 +366,33 @@ a {
     background: var(--accent-color-3);
     color: #eee;
 }
+
+.weather-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 3.6rem;
+    list-style: none;
+    font-size: .8rem;
+  }
+  .weather-details li {
+    display: flex;
+    align-items: center;
+  }
+  .weather-details li .icon {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+  .weather-details li.temperature .icon {
+    fill: var(--accent-color-6);
+  }
+  .weather-details li.apparent .icon {
+    fill: var(--accent-color-6-40);
+  }
+  .weather-details li.dewpoint .icon {
+    fill: var(--accent-color-5);
+  }
+  .weather-details li .text {
+    flex: 1;
+    margin-left: .3rem;
+  }

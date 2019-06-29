@@ -25,7 +25,14 @@ module.exports = (env, argv) => ({
       },
       {
         test: /\.svg$/,
-        loader: 'react-svg-loader'
+        loader: 'react-svg-loader',
+        options: {
+          svgo: {
+            plugins: [
+              {removeViewBox: false}
+            ]
+          }
+        }
       }
     ]
   },

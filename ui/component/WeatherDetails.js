@@ -1,8 +1,10 @@
 import {h, Component} from 'preact'
+import DegreeIcon from '../resources/degree.svg'
 
 export default class WeatherDetails extends Component {
   render() {
     let {
+      units,
       temperature,
       apparentTemperature,
       dewPoint,
@@ -19,8 +21,19 @@ export default class WeatherDetails extends Component {
       precipAccumulation
     } = this.props
 
-    return <div class="weather-details">
-
-    </div>
+    return <ul class="weather-details">
+      <li class="temperature" title="Temperature">
+        <DegreeIcon class="icon"/>
+        <span class="text">{temperature} {units.temperature}</span>
+      </li>
+      <li class="apparent" title="Perceived Temperature">
+        <DegreeIcon class="icon"/>
+        <span class="text">{apparentTemperature} {units.apparentTemperature}</span>
+      </li>
+      <li class="dewpoint" title="Dew Point">
+        <DegreeIcon class="icon"/>
+        <span class="text">{dewPoint} {units.dewPoint}</span>
+      </li>
+    </ul>
   }
 }

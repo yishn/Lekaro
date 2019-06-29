@@ -104,7 +104,7 @@ export default class App extends Component {
       if (precise) {
         let date = new Date(timestamp * 1000)
         minute = date.getMinutes()
-    }
+      }
 
       return column - 1 + minute / 60
     }
@@ -249,6 +249,16 @@ export default class App extends Component {
         />
         : <WeatherTimeline {...getPlaceholderProps()} style={{opacity: .5}}/>}
       </div>
+
+      {selectedHour &&
+        <WeatherDetails
+          units={unitsData[units]}
+
+          temperature={selectedHour.temperature}
+          apparentTemperature={selectedHour.apparentTemperature}
+          dewPoint={selectedHour.dewPoint}
+        />
+      }
     </div>
   }
 }
