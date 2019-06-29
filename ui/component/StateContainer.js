@@ -82,9 +82,7 @@ export default class StateContainer extends Component {
   }
 
   selectTime = timestamp => {
-    this.setState({
-      selectedTime: timestamp
-    })
+    this.setState({selectedTime: timestamp})
   }
 
   selectUnits = units => {
