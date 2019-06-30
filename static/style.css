@@ -156,9 +156,16 @@ a {
 }
 
 .precipitation-graph .probability {
-  fill: var(--accent-color-7);
-  stroke: var(--accent-color-7);
-  opacity: .9;
+    fill: var(--accent-color-7);
+    stroke: var(--accent-color-7);
+    stroke-width: 3;
+    opacity: .9;
+  }
+  .precipitation-graph .humidity {
+    fill: var(--accent-color-5);
+    stroke: var(--accent-color-5);
+    stroke-width: 3;
+    opacity: .3;
 }
 
 .temperature-graph .helperlines {

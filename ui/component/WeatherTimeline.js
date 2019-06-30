@@ -11,6 +11,8 @@ export function getPlaceholderProps({columns = 7 * 24 + 6} = {}) {
     20 - 10 * Math.cos((i - 3) * 2 * Math.PI / 24)
   )
 
+  let zeroes = columnArray.map(_ => 0)
+
   return {
     columns: 7 * 24 + 6,
     tickLabels: columnArray.map(_ => ''),
@@ -20,12 +22,13 @@ export function getPlaceholderProps({columns = 7 * 24 + 6} = {}) {
       end: 6 + i * 24,
       moonPhase: 0
     })),
-    uvIndex: columnArray.map(_ => 0),
-    cloudCover: columnArray.map(_ => 0),
+    uvIndex: zeroes,
+    cloudCover: zeroes,
     precipitation: columnArray.map(i => ({
       x: i,
       probability: 0
     })),
+    humidity: zeroes,
     temperature: temperature.map(t => t - 3),
     apparentTemperature: temperature.map(t => t + 1),
     dewPoint: temperature.map(t => t - 7)
@@ -152,7 +155,7 @@ function LabeledTicks({columnWidth, labels, showLabels, labelPosition, nightColu
   </ol>
 }
 
-function CloudBar({columnWidth, units, cloudCover, precipitation}) {
+function CloudBar({columnWidth, units, cloudCover, precipitation, humidity}) {
   let percent = p => `${Math.round(p * 100)}%`
   let capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase()
   let round1 = x => Math.round(x * 10) / 10
@@ -172,6 +175,8 @@ function CloudBar({columnWidth, units, cloudCover, precipitation}) {
         : cloudCover[i] < .75 ? 'Mostly Cloudy'
         : 'Overcast'
       )}: ${percent(cloudCover[i])}`,
+
+      `Humidity: ${percent(humidity[i])}`,
 
       precipProbability && precipType &&
         `${capitalize(precipType)} Probability: ${percent(precipProbability)}`,
@@ -196,11 +201,13 @@ function CloudBar({columnWidth, units, cloudCover, precipitation}) {
   </ol>
 }
 
-function PrecipitationGraph({columnWidth, graphHeight, width, precipitation}) {
-  if (precipitation.length === 0) return
+function PrecipitationGraph({columnWidth, graphHeight, width, precipitation, humidity}) {
+  if (precipitation.length === 0 || humidity.length === 0) return
 
-  let xs = precipitation.map(entry => entry.x * columnWidth)
-  let ys = precipitation.map(entry => entry.probability * graphHeight)
+  let xs = humidity.map((_, i) => i * columnWidth)
+  let hys = humidity.map(x => (1 - x) * graphHeight)
+  let pxs = precipitation.map(entry => entry.x * columnWidth)
+  let pys = precipitation.map(entry => entry.probability * graphHeight)
 
   return <div class="precipitation-graph">
     <svg
@@ -208,12 +215,19 @@ function PrecipitationGraph({columnWidth, graphHeight, width, precipitation}) {
       height={graphHeight}
     >
       <SmoothInterpolatingCurve
-        xs={[0, ...xs]}
-        ys={[ys[0], ...ys]}
-        additionalPoints={[[width, ys.slice(-1)[0]], [width, 0], [0, 0]]}
+        xs={[0, ...pxs]}
+        ys={[pys[0], ...pys]}
+        additionalPoints={[[width, pys.slice(-1)[0]], [width, 0], [0, 0]]}
         innerProps={{
-          class: 'probability',
-          'stroke-width': 3
+          class: 'probability'
+        }}
+      />
+      <SmoothInterpolatingCurve
+        xs={xs}
+        ys={hys}
+        additionalPoints={[[width, hys.slice(-1)[0]], [width, graphHeight], [0, graphHeight]]}
+        innerProps={{
+          class: 'humidity'
         }}
       />
     </svg>
@@ -432,6 +446,7 @@ export default class WeatherTimeline extends Component {
       uvIndex = [],
       nightColumns = [],
       cloudCover = [],
+      humidity = [],
       temperature = [],
       apparentTemperature = [],
       dewPoint = [],
@@ -478,6 +493,7 @@ export default class WeatherTimeline extends Component {
         columnWidth={columnWidth}
         units={units}
         cloudCover={cloudCover}
+        humidity={humidity}
         precipitation={
           precipitation
             .reduce((acc, entry) => {
@@ -520,6 +536,7 @@ export default class WeatherTimeline extends Component {
         <PrecipitationGraph
           {...graphProps}
           precipitation={precipitation}
+          humidity={humidity}
         />
 
         <TemperatureGraph

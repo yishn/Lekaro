@@ -252,6 +252,11 @@ export default class App extends Component {
             && forecastData.hourly.map(entry => entry.cloudCover)
           }
 
+          humidity={
+            forecastData.hourly
+            && forecastData.hourly.map(entry => entry.humidity)
+          }
+
           temperature={
             forecastData.hourly
             && forecastData.hourly.map(entry => entry.temperature)
