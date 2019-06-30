@@ -2,8 +2,8 @@ import {h, Component} from 'preact'
 import {Duration} from 'luxon'
 import * as time from '../time.js'
 import LocationInfo from './LocationInfo.js'
-import WeatherTimeline, { getPlaceholderProps } from './WeatherTimeline.js'
-import WeatherDetails from './WeatherDetails.js';
+import WeatherTimeline, {getPlaceholderProps} from './WeatherTimeline.js'
+import WeatherDetails from './WeatherDetails.js'
 
 const unitsData = {
   'si': {
@@ -185,6 +185,40 @@ export default class App extends Component {
     let selectedColumn = getColumnFromTimestamp(selectedTime)
     let selectedHour = forecastData.hourly && forecastData.hourly[selectedColumn]
 
+    let selectedHourPrecipitation = selectedHour && forecastData.precipitation && (() => {
+      let entries = forecastData.precipitation
+        .filter(entry =>
+          selectedHour.time <= entry.time
+          && entry.time < (
+            forecastData.hourly[selectedColumn + 1]
+            ? forecastData.hourly[selectedColumn + 1].time
+            : selectedHour.time + 24 * 60 * 60
+          )
+        )
+
+      let max = key => {
+        let result = Math.max(...entries.filter(x => x[key] != null).map(x => x[key]))
+        return isFinite(result) ? result : undefined
+      }
+
+      return {
+        intensity: max('intensity'),
+        accumulation: max('accumulation'),
+        probability: max('probability'),
+        type: (Object.entries(
+          entries
+          .filter(x => x.type != null)
+          .map(x => x.type)
+          .reduce((acc, type) => {
+            acc[type] = (acc[type] || 0) + 1
+            return acc
+          }, {})
+        ).find(([_, count], __, arr) =>
+          arr.every(([_, count2]) => count >= count2)
+        ) || {})[0]
+      }
+    })() || {}
+
     return <div class="lekaro-app">
       <h1>Lekaro Weather</h1>
 
@@ -250,13 +284,24 @@ export default class App extends Component {
         : <WeatherTimeline {...getPlaceholderProps()} style={{opacity: .5}}/>}
       </div>
 
-      {selectedHour &&
+      {!error && selectedHour &&
         <WeatherDetails
           units={unitsData[units]}
 
           temperature={selectedHour.temperature}
           apparentTemperature={selectedHour.apparentTemperature}
           dewPoint={selectedHour.dewPoint}
+          humidity={selectedHour.humidity}
+          ozone={selectedHour.ozone}
+          pressure={selectedHour.pressure}
+          windBearing={selectedHour.windBearing}
+          windSpeed={selectedHour.windSpeed}
+          windGust={selectedHour.windGust}
+          visibility={selectedHour.visibility}
+          precipProbability={selectedHourPrecipitation.probability}
+          precipType={selectedHourPrecipitation.type}
+          precipIntensity={selectedHourPrecipitation.intensity}
+          precipAccumulation={selectedHourPrecipitation.accumulation}
         />
       }
     </div>

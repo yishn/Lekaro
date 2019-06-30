@@ -54,7 +54,7 @@ a {
     animation: loading 1s linear infinite;
   }
   .location-info h2 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: normal;
   }
   .location-info h2 input {
@@ -369,19 +369,25 @@ a {
 
 .weather-details {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     justify-content: center;
-    height: 3.6rem;
-    list-style: none;
+    padding: .5rem;
     font-size: .8rem;
+  }
+  .weather-details ul {
+    width: 7rem;
+    margin: 0 .5rem;
+    list-style: none;
   }
   .weather-details li {
     display: flex;
     align-items: center;
+    margin: .5rem 0;
   }
   .weather-details li .icon {
     width: 1.2rem;
     height: 1.2rem;
+    transition: transform .2s;
   }
   .weather-details li.temperature .icon {
     fill: var(--accent-color-6);
@@ -395,4 +401,4 @@ a {
   .weather-details li .text {
     flex: 1;
     margin-left: .3rem;
-  }
+}

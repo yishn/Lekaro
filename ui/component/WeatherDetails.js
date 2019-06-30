@@ -1,7 +1,39 @@
 import {h, Component} from 'preact'
 import DegreeIcon from '../resources/degree.svg'
+import HumidityIcon from '../resources/humidity.svg'
+import OzoneIcon from '../resources/ozone.svg'
+import PressureIcon from '../resources/pressure.svg'
+import WindIcon from '../resources/wind.svg'
+import GustIcon from '../resources/gust.svg'
+import VisibilityIcon from '../resources/visibility.svg'
+import UmbrellaOpenIcon from '../resources/umbrella-open.svg'
+import UmbrellaClosedIcon from '../resources/umbrella-closed.svg'
+import RainIcon from '../resources/rain.svg'
+import SnowIcon from '../resources/snow.svg'
+import SleetIcon from '../resources/sleet.svg'
+import AccumulationIcon from '../resources/accumulation.svg'
 
 export default class WeatherDetails extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      windBearing: 0
+    }
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    let {windBearing} = props
+
+    while (Math.abs(state.windBearing - windBearing) > 180) {
+      let sign = Math.sign(state.windBearing - windBearing)
+
+      windBearing = windBearing + sign * 360
+    }
+
+    return {windBearing}
+  }
+
   render() {
     let {
       units,
@@ -11,7 +43,6 @@ export default class WeatherDetails extends Component {
       humidity,
       ozone,
       pressure,
-      windBearing,
       windSpeed,
       windGust,
       visibility,
@@ -21,19 +52,87 @@ export default class WeatherDetails extends Component {
       precipAccumulation
     } = this.props
 
-    return <ul class="weather-details">
-      <li class="temperature" title="Temperature">
-        <DegreeIcon class="icon"/>
-        <span class="text">{temperature} {units.temperature}</span>
-      </li>
-      <li class="apparent" title="Perceived Temperature">
-        <DegreeIcon class="icon"/>
-        <span class="text">{apparentTemperature} {units.apparentTemperature}</span>
-      </li>
-      <li class="dewpoint" title="Dew Point">
-        <DegreeIcon class="icon"/>
-        <span class="text">{dewPoint} {units.dewPoint}</span>
-      </li>
-    </ul>
+    let {windBearing} = this.state
+    let capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase()
+    let round = (x, n = 0) => Math.round(x * 10 ** n) / 10 ** n
+
+    return <div class="weather-details">
+      <ul>
+        <li class="temperature" title="Temperature">
+          <DegreeIcon class="icon"/>
+          <span class="text">{round(temperature, 1)} {units.temperature}</span>
+        </li>
+        <li class="apparent" title="Perceived Temperature">
+          <DegreeIcon class="icon"/>
+          <span class="text">{round(apparentTemperature, 1)} {units.apparentTemperature}</span>
+        </li>
+        <li class="dewpoint" title="Dew Point">
+          <DegreeIcon class="icon"/>
+          <span class="text">{round(dewPoint, 1)} {units.dewPoint}</span>
+        </li>
+      </ul>
+      <ul>
+        <li title="Relative Humidity">
+          <HumidityIcon class="icon"/>
+          <span class="text">{round(humidity * 100)}%</span>
+        </li>
+        <li title="Columnar Density of Total Atmospheric Ozone">
+          <OzoneIcon class="icon"/>
+          <span class="text">{round(ozone, 2)} {units.ozone}</span>
+        </li>
+        <li title="Sea-Level Air Pressure">
+          <PressureIcon class="icon"/>
+          <span class="text">{round(pressure, 2)} {units.pressure}</span>
+        </li>
+      </ul>
+      <ul>
+        <li title="Wind Speed">
+          <WindIcon class="icon" style={{transform: `rotate(${windBearing}deg)`}}/>
+          <span class="text">{round(windSpeed, 2)} {units.windSpeed}</span>
+        </li>
+        <li title="Wind Gust Speed">
+          <GustIcon class="icon"/>
+          <span class="text">{round(windGust, 2)} {units.windGust}</span>
+        </li>
+        <li title="Average Visibility">
+          <VisibilityIcon class="icon"/>
+          <span class="text">{
+            (
+              units.visibility === 'km'
+              && visibility >= 16.093
+              || units.visibility === 'mi'
+              && visibility >= 10 ? '≥' : ''
+            ) + round(visibility, 2)
+          } {units.visibility}</span>
+        </li>
+      </ul>
+      <ul>
+        <li title={`${precipType != null ? capitalize(precipType) : 'Precipitation'} Probability`}>
+          {
+            precipProbability >= .25 ? <UmbrellaOpenIcon class="icon"/>
+            : <UmbrellaClosedIcon class="icon"/>
+          }
+          <span class="text">{round(precipProbability * 100)}%</span>
+        </li>
+        <li title={`${precipType != null ? capitalize(precipType) : 'Precipitation'} Intensity`}>
+          {
+            precipType === 'snow' ? <SnowIcon class="icon"/>
+            : precipType === 'sleet' ? <SleetIcon class="icon"/>
+            : <RainIcon class="icon"/>
+          }
+          <span class="text">
+            {precipType != null ? round(precipIntensity, 2) : '-'}{' '}
+            {precipType != null && units.precipitation.intensity}
+          </span>
+        </li>
+        <li title="Snow Accumulation">
+          <AccumulationIcon class="icon"/>
+          <span class="text">
+            {precipAccumulation != null ? round(precipAccumulation, 2) : '-'}{' '}
+            {precipAccumulation != null && units.precipitation.accumulation}
+          </span>
+        </li>
+      </ul>
+    </div>
   }
 }
