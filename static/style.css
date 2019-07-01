@@ -409,6 +409,12 @@ a {
   .weather-details li.dewpoint .icon {
     fill: var(--accent-color-5);
   }
+  .weather-details li.humidity .icon {
+    fill: var(--accent-color-5)
+  }
+  .weather-details li.precipitation .icon {
+    fill: var(--accent-color-7);
+  }
   .weather-details li .text {
     flex: 1;
     margin-left: .5rem;

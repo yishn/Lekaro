@@ -1,13 +1,11 @@
 import {h, Component} from 'preact'
 import DegreeIcon from '../resources/degree.svg'
-import HumidityIcon from '../resources/humidity.svg'
+import AreaIcon from '../resources/area.svg'
 import OzoneIcon from '../resources/ozone.svg'
 import PressureIcon from '../resources/pressure.svg'
 import WindIcon from '../resources/wind.svg'
 import GustIcon from '../resources/gust.svg'
 import VisibilityIcon from '../resources/visibility.svg'
-import UmbrellaOpenIcon from '../resources/umbrella-open.svg'
-import UmbrellaClosedIcon from '../resources/umbrella-closed.svg'
 import RainIcon from '../resources/rain.svg'
 import SnowIcon from '../resources/snow.svg'
 import SleetIcon from '../resources/sleet.svg'
@@ -72,48 +70,19 @@ export default class WeatherDetails extends Component {
         </li>
       </ul>
       <ul>
-        <li title="Relative Humidity">
-          <HumidityIcon class="icon"/>
-          <span class="text">{round(humidity * 100)}%</span>
-        </li>
-        <li title="Columnar Density of Total Atmospheric Ozone">
-          <OzoneIcon class="icon"/>
-          <span class="text">{round(ozone, 2)} {units.ozone}</span>
-        </li>
-        <li title="Sea-Level Air Pressure">
-          <PressureIcon class="icon"/>
-          <span class="text">{round(pressure, 2)} {units.pressure}</span>
-        </li>
-      </ul>
-      <ul>
-        <li title="Wind Speed">
-          <WindIcon class="icon" style={{transform: `rotate(${windBearing}deg)`}}/>
-          <span class="text">{round(windSpeed, 2)} {units.windSpeed}</span>
-        </li>
-        <li title="Wind Gust Speed">
-          <GustIcon class="icon"/>
-          <span class="text">{round(windGust, 2)} {units.windGust}</span>
-        </li>
-        <li title="Average Visibility">
-          <VisibilityIcon class="icon"/>
-          <span class="text">{
-            (
-              units.visibility === 'km'
-              && visibility >= 16.093
-              || units.visibility === 'mi'
-              && visibility >= 10 ? '≥' : ''
-            ) + round(visibility, 2)
-          } {units.visibility}</span>
-        </li>
-      </ul>
-      <ul>
-        <li title={`${precipType != null ? capitalize(precipType) : 'Precipitation'} Probability`}>
-          {
-            precipProbability >= .25 ? <UmbrellaOpenIcon class="icon"/>
-            : <UmbrellaClosedIcon class="icon"/>
-          }
+        <li
+          class="precipitation"
+          title={`${precipType != null ? capitalize(precipType) : 'Precipitation'} Probability`}
+        >
+          <AreaIcon class="icon"/>
           <span class="text">{round(precipProbability * 100)}%</span>
         </li>
+        <li class="humidity" title="Relative Humidity">
+          <AreaIcon class="icon"/>
+          <span class="text">{round(humidity * 100)}%</span>
+        </li>
+      </ul>
+      <ul>
         <li title={`${precipType != null ? capitalize(precipType) : 'Precipitation'} Intensity`}>
           {
             precipType === 'snow' ? <SnowIcon class="icon"/>
@@ -131,6 +100,37 @@ export default class WeatherDetails extends Component {
             {precipAccumulation != null ? round(precipAccumulation, 2) : '-'}{' '}
             {precipAccumulation != null && units.precipitation.accumulation}
           </span>
+        </li>
+      </ul>
+      <ul>
+        <li title="Wind Speed">
+          <WindIcon class="icon" style={{transform: `rotate(${windBearing}deg)`}}/>
+          <span class="text">{round(windSpeed, 2)} {units.windSpeed}</span>
+        </li>
+        <li title="Wind Gust Speed">
+          <GustIcon class="icon"/>
+          <span class="text">{round(windGust, 2)} {units.windGust}</span>
+        </li>
+      </ul>
+      <ul>
+        <li title="Sea-Level Air Pressure">
+          <PressureIcon class="icon"/>
+          <span class="text">{round(pressure, 2)} {units.pressure}</span>
+        </li>
+        <li title="Columnar Density of Total Atmospheric Ozone">
+          <OzoneIcon class="icon"/>
+          <span class="text">{round(ozone, 2)} {units.ozone}</span>
+        </li>
+        <li title="Average Visibility">
+          <VisibilityIcon class="icon"/>
+          <span class="text">{
+            (
+              units.visibility === 'km'
+              && visibility >= 16.093
+              || units.visibility === 'mi'
+              && visibility >= 10 ? '≥' : ''
+            ) + round(visibility, 2)
+          } {units.visibility}</span>
         </li>
       </ul>
     </div>
