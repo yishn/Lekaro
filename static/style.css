@@ -47,7 +47,9 @@ a {
     position: relative;
     padding: 1.5rem 3rem 2rem;
     border-top: 5px solid transparent;
+    box-shadow: 0 -.5rem 2rem rgba(75, 29, 55, .2);
     font-family: Raleway, sans-serif;
+    z-index: 2;
   }
   .location-info.loading {
     color: #888;
@@ -92,7 +94,9 @@ a {
 }
 
 .timeline-wrapper {
+  position: relative;
   overflow: auto;
+  z-index: 1;
 }
 
 .weather-timeline {
