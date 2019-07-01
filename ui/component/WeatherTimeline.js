@@ -1,7 +1,7 @@
 import {h, Component} from 'preact'
 import classnames from 'classnames'
 import SmoothInterpolatingCurve from './SmoothInterpolatingCurve.js'
-import * as time from '../time.js';
+import * as time from '../time.js'
 
 export function getPlaceholderProps({columns = 7 * 24 + 6} = {}) {
   let now = Math.round(new Date().getTime() / 1000)
@@ -155,38 +155,16 @@ function LabeledTicks({columnWidth, labels, showLabels, labelPosition, nightColu
   </ol>
 }
 
-function CloudBar({columnWidth, units, cloudCover, precipitation, humidity}) {
+function CloudBar({columnWidth, units, cloudCover, precipitation}) {
   let percent = p => `${Math.round(p * 100)}%`
-  let capitalize = str => str[0].toUpperCase() + str.slice(1).toLowerCase()
-  let round1 = x => Math.round(x * 10) / 10
 
   let getCloudCoverDescription = i => {
-    let {
-      probability: precipProbability,
-      intensity: precipIntensity,
-      accumulation: precipAccumulation,
-      type: precipType
-    } = precipitation[i] || {}
-
-    return [
-      `${(
-        cloudCover[i] < .25 ? 'Clear'
-        : cloudCover[i] < .5 ? 'Partly Cloudy'
-        : cloudCover[i] < .75 ? 'Mostly Cloudy'
-        : 'Overcast'
-      )}: ${percent(cloudCover[i])}`,
-
-      `Humidity: ${percent(humidity[i])}`,
-
-      precipProbability && precipType &&
-        `${capitalize(precipType)} Probability: ${percent(precipProbability)}`,
-
-      precipIntensity && round1(precipIntensity) > 0 && precipType &&
-        `${capitalize(precipType)} Intensity: ${round1(precipIntensity)} ${units.precipitation.intensity}`,
-
-      precipAccumulation && round1(precipAccumulation) > 0 && precipType &&
-        `${capitalize(precipType)} Accumulation: ${round1(precipAccumulation)} ${units.precipitation.accumulation}`
-    ].filter(x => !!x).join('\n')
+    return `${percent(cloudCover[i])}: ${(
+      cloudCover[i] < .25 ? 'Clear'
+      : cloudCover[i] < .5 ? 'Partly Cloudy'
+      : cloudCover[i] < .75 ? 'Mostly Cloudy'
+      : 'Overcast'
+    )}`
   }
 
   return <ol class="cloud-bar" style={{width: cloudCover.length * columnWidth}}>
@@ -493,7 +471,6 @@ export default class WeatherTimeline extends Component {
         columnWidth={columnWidth}
         units={units}
         cloudCover={cloudCover}
-        humidity={humidity}
         precipitation={
           precipitation
             .reduce((acc, entry) => {
