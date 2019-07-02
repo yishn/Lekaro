@@ -393,6 +393,7 @@ export default class WeatherTimeline extends Component {
   handleMouseDown = evt => {
     if (evt.buttons === 1) {
       evt.preventDefault()
+      this.element.focus()
 
       let {columnWidth = 24, tickLabels = []} = this.props
       let {left} = this.element.getBoundingClientRect()
@@ -408,6 +409,21 @@ export default class WeatherTimeline extends Component {
 
         onColumnClick({column})
       }
+    }
+  }
+
+  handleKeyDown = evt => {
+    if (evt.key === 'ArrowLeft' || evt.key === 'ArrowRight') {
+      evt.preventDefault()
+
+      let step = evt.key === 'ArrowLeft' ? -1 : 1
+      let {selectedColumn, tickLabels = [], onColumnClick = () => {}} = this.props
+
+      if (selectedColumn == null) selectedColumn = 0
+
+      onColumnClick({
+        column: Math.max(0, Math.min(selectedColumn + step, tickLabels.length - 1))
+      })
     }
   }
 
@@ -444,9 +460,11 @@ export default class WeatherTimeline extends Component {
       ref={el => (this.element = el, innerProps.ref && innerProps.ref(el))}
       class="weather-timeline"
       style={{...style, boxSizing: 'content-box', width}}
+      tabIndex="0"
 
       onMouseMove={this.handleMouseDown}
       onMouseDown={this.handleMouseDown}
+      onKeyDown={this.handleKeyDown}
     >
       <NightBackground
         columnWidth={columnWidth}

@@ -1,4 +1,5 @@
 import {h, Component} from 'preact'
+import {useMemo} from 'preact/hooks'
 import {Duration} from 'luxon'
 import * as time from '../time.js'
 import LocationInfo from './LocationInfo.js'
@@ -37,16 +38,6 @@ const unitsData = {
 }
 
 export default class App extends Component {
-  get title() {
-    let {city, state, country} = this.props.locationInfo.address || {}
-    let result = `${[city, state, country].filter(x => !!x).join(', ')}`
-
-    if (result.trim() !== '') result += ' - '
-    result += 'Lekaro Weather'
-
-    return result
-  }
-
   componentDidMount() {
     // Load forecast
 
@@ -65,6 +56,16 @@ export default class App extends Component {
     if (prevProps.loading && !this.props.loading && this.props.error) {
       this.inputElement.focus()
     }
+  }
+
+  get title() {
+    let {city, state, country} = this.props.locationInfo.address || {}
+    let result = `${[city, state, country].filter(x => !!x).join(', ')}`
+
+    if (result.trim() !== '') result += ' - '
+    result += 'Lekaro Weather'
+
+    return result
   }
 
   handleSearch = evt => {
@@ -109,13 +110,20 @@ export default class App extends Component {
       return column - 1 + minute / 60
     }
 
-    let hourlyTimes = forecastData.hourly && forecastData.hourly.map(entry =>
-      time.fromUnixTimestamp(entry.time, forecastData.timezone)
-    )
+    let hourlyTimestamps = (forecastData.hourly || []).map(entry => entry.time)
+    let dailyTimestamps = (forecastData.daily || []).map(entry => entry.time)
 
-    let dailyTimes = forecastData.daily && forecastData.daily.map(entry =>
-      time.fromUnixTimestamp(entry.time, forecastData.timezone)
-    )
+    let hourlyTimes = useMemo(() => {
+      return hourlyTimestamps.map(timestamp =>
+        time.fromUnixTimestamp(timestamp, forecastData.timezone)
+      )
+    }, [...hourlyTimestamps, forecastData.timezone])
+
+    let dailyTimes = useMemo(() => {
+      return dailyTimestamps.map(timestamp =>
+        time.fromUnixTimestamp(timestamp, forecastData.timezone)
+      )
+    }, [...dailyTimestamps, forecastData.timezone])
 
     let nightColumns = forecastData.daily && forecastData.hourly &&
       [...forecastData.daily, null]
