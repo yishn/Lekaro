@@ -1,5 +1,6 @@
 import {h, Component} from 'preact'
 import classnames from 'classnames'
+import scrollIntoView from 'scroll-into-view-if-needed'
 import SmoothInterpolatingCurve from './SmoothInterpolatingCurve.js'
 import * as time from '../time.js'
 
@@ -390,6 +391,18 @@ function MainLabels({columnWidth, labels}) {
 }
 
 export default class WeatherTimeline extends Component {
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.selectedColumn !== this.props.selectedColumn
+      && this.props.selectedColumn != null
+    ) {
+      clearTimeout(this.scrollIntoViewTimeoutId)
+      this.scrollIntoViewTimeoutId = setTimeout(() => {
+        scrollIntoView(this.element.querySelector('.selected'))
+      }, 100)
+    }
+  }
+
   handleMouseDown = evt => {
     if (evt.buttons === 1) {
       evt.preventDefault()
