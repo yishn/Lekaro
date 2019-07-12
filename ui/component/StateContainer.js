@@ -1,5 +1,6 @@
+import {stringify as qs} from 'querystring'
 import {h, Component} from 'preact'
-import {getCurrentCoordinates} from '../geolocation.js'
+import * as geolocation from '../geolocation.js'
 
 export default class StateContainer extends Component {
   constructor(props) {
@@ -39,22 +40,33 @@ export default class StateContainer extends Component {
       // Get current location
 
       try {
-        coordinates = await getCurrentCoordinates()
+        coordinates = await geolocation.current()
       } catch (err) {
         name = 'Heidelberg'
       }
     }
 
-    let enc = encodeURIComponent
+    // Determine location
+
+    let locationInfo = name != null ? await geolocation.get(name, {language: 'en-US'})
+      : coordinates != null ? await geolocation.reverse(coordinates, {language: 'en-US'})
+      : null
+
+    if (coordinates == null) {
+      coordinates = locationInfo.coordinates
+    }
+
     let historyMethod = replaceHistory ? 'replaceState'
       : pushHistory ? 'pushState'
       : null
-    let url = name != null
-      ? `/forecast?name=${enc(name)}`
-      : `/forecast?lat=${enc(coordinates[1])}&lon=${enc(coordinates[0])}`
 
     try {
-      let response = await fetch(`${url}&units=${enc(this.state.units)}&language=en-US`)
+      let response = await fetch(`/forecast?${qs({
+        lat: coordinates[1],
+        lon: coordinates[0],
+        units: this.state.units
+      })}`)
+
       if (!response.ok) throw new Error()
 
       let {info, forecast} = await response.json()
@@ -66,7 +78,7 @@ export default class StateContainer extends Component {
       this.setState({
         loading: false,
         error: false,
-        locationInfo: info,
+        locationInfo,
         forecastData: forecast
       })
     } catch (err) {

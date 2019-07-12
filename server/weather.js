@@ -15,9 +15,9 @@ async function darkSkyRequest(path, options = {}) {
     {compress: true}
   )
 
-  let body = await response.json()
-
   if (!response.ok) throw new Error(body.error);
+
+  let body = await response.json()
 
   cache[key] = body
   setTimeout(() => {

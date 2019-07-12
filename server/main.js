@@ -1,7 +1,6 @@
 import express from 'express'
 import {join} from 'path'
-import * as geocoding from './geocoding.js'
-import * as weather from './weather.js'
+import {getForecast} from './weather.js'
 import config from '../config.js'
 
 const app = express()
@@ -24,20 +23,9 @@ function route(func) {
 }
 
 app.get('/forecast', route(async (req, res) => {
-  let {name, lon, lat, units, language} = req.query
+  let {lon, lat, units} = req.query
   let info = {coordinates: [lon, lat]}
-
-  if (lon == null || lat == null) {
-    info = await geocoding.get(name, {language})
-
-    if (info == null) {
-      throw new Error('No location found by given name')
-    }
-  } else {
-    info = await geocoding.reverse([lon, lat], {language})
-  }
-
-  let forecast = await weather.getForecast(info.coordinates, {units})
+  let forecast = await getForecast(info.coordinates, {units})
 
   return {
     info,
