@@ -1,4 +1,5 @@
-import request from 'request'
+import {stringify as qs} from 'querystring'
+import fetch from 'node-fetch'
 import config from '../config.js'
 
 let cache = {}
@@ -9,25 +10,21 @@ async function darkSkyRequest(path, options = {}) {
 
   console.log('info: Request Dark Sky', path, options)
 
-  return await new Promise((resolve, reject) => {
-    request({
-      url: path,
-      baseUrl: `https://api.darksky.net/forecast/${config.darkSkyApiKey}/`,
-      qs: options,
-      json: true,
-      gzip: true
-    }, (err, response, body) => {
-      if (err != null) return reject(err)
-      if (response.statusCode < 200 || response.statusCode >= 300) return reject(new Error(body.error))
+  let response = await fetch(
+    `https://api.darksky.net/forecast/${config.darkSkyApiKey}${path}?${qs(options)}`,
+    {compress: true}
+  )
 
-      cache[key] = body
-      setTimeout(() => {
-        delete cache[key]
-      }, 60 * 1000)
+  let body = await response.json()
 
-      resolve(body)
-    })
-  })
+  if (!response.ok) throw new Error(body.error);
+
+  cache[key] = body
+  setTimeout(() => {
+    delete cache[key]
+  }, 60 * 1000 /* 1 min */)
+
+  return body
 }
 
 function transformDarkSkyResponse(response) {

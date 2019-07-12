@@ -1,4 +1,5 @@
-import request from 'request'
+import {stringify as qs} from 'querystring'
+import fetch from 'node-fetch'
 
 let lastRequestTime = null
 let cache = {}
@@ -19,25 +20,27 @@ async function nominatimRequest(path, options = {}) {
 
   console.log('info: Request Nominatim', path, options)
 
-  return await new Promise((resolve, reject) => {
-    request({
-      url: path,
-      baseUrl: `https://nominatim.openstreetmap.org/`,
+  let response = await fetch(
+    `https://nominatim.openstreetmap.org${path}?${qs({...options, format: 'jsonv2'})}`,
+    {
       headers: {
         'User-Agent': 'Lekaro',
         'Accept-Language': options.language
-      },
-      qs: {...options, format: 'jsonv2'},
-      json: true
-    }, (err, response, body) => {
-      if (err != null) return reject(err)
-      if (response.statusCode < 200 || response.statusCode >= 300) return reject(new Error('Response not OK'))
-      if (body.error != null) return reject(new Error(body.error))
+      }
+    }
+  )
 
-      cache[key] = body
-      resolve(body)
-    })
-  })
+  let body = await response.json()
+
+  if (!response.ok) throw new Error('Response not OK')
+  if (body.error != null) throw new Error(body.error)
+
+  cache[key] = body
+  setTimeout(() => {
+    delete cache[key]
+  }, 24 * 60 * 60 * 1000 /* 1 day */)
+
+  return body
 }
 
 function transformNominatimResponse(response) {
