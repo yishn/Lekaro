@@ -59,13 +59,16 @@ export default class App extends Component {
   }
 
   get title() {
-    let {city, state, country} = this.props.locationInfo.address || {}
-    let result = `${[city, state, country].filter(x => !!x).join(', ')}`
+    let result = ''
 
-    if (result.trim() !== '') result += ' - '
-    result += 'Lekaro Weather'
+    if (!this.props.error) {
+      let {city, state, country} = this.props.locationInfo.address || {}
+      result += `${[city, state, country].filter(x => !!x).join(', ')}`
 
-    return result
+      if (result.trim() !== '') result += ' - '
+    }
+
+    return result + 'Lekaro Weather'
   }
 
   handleSearch = evt => {
