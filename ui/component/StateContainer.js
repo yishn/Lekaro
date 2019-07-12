@@ -52,15 +52,15 @@ export default class StateContainer extends Component {
       : coordinates != null ? await geolocation.reverse(coordinates, {language: 'en-US'})
       : null
 
-    if (coordinates == null) {
-      coordinates = locationInfo.coordinates
-    }
-
     let historyMethod = replaceHistory ? 'replaceState'
       : pushHistory ? 'pushState'
       : null
 
     try {
+      if (coordinates == null) {
+        coordinates = locationInfo.coordinates
+      }
+
       let response = await fetch(`/forecast?${qs({
         lat: coordinates[1],
         lon: coordinates[0],
