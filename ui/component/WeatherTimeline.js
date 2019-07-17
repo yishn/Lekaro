@@ -445,7 +445,7 @@ export default class WeatherTimeline extends Component {
       innerProps = {},
       style = {},
       columnWidth = 24,
-      graphHeight = 200,
+      graphHeight = 180,
       selectedColumn = null,
       tickLabels = [],
       labels = [],
@@ -540,7 +540,7 @@ export default class WeatherTimeline extends Component {
         }
       />
 
-      <div class="graph" style={{width: columnWidth * tickLabels.length, height: 200}}>
+      <div class="graph" style={{width: columnWidth * tickLabels.length, height: graphHeight}}>
         <PrecipitationGraph
           {...graphProps}
           precipitation={precipitation}
