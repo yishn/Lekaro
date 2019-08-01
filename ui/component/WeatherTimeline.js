@@ -51,7 +51,7 @@ function NightBackground({columnWidth, width, nightColumns}) {
         }}
       >
         {moonPhase != null && end - start >= 1 &&
-          <svg class="moon" width="1.2rem" height="1.2rem" viewBox="0 0 1 1">
+          <svg class="moon" style={{width: '1.2rem', height: '1.2rem'}} viewBox="0 0 1 1">
             <title>
               {moonPhase === 0 ? 'New Moon'
                 : moonPhase < .25 ? 'Waxing Crescent'
