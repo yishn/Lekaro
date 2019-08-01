@@ -94,13 +94,13 @@ export default class WeatherDetails extends Component {
             {precipType != null && units.precipitation.intensity}
           </span>
         </li>
-        <li title="Snow Accumulation">
+        {precipAccumulation != null && <li title="Snow Accumulation">
           <AccumulationIcon class="icon"/>
           <span class="text">
-            {precipAccumulation != null ? round(precipAccumulation, 2) : '-'}{' '}
-            {precipAccumulation != null && units.precipitation.accumulation}
+            {round(precipAccumulation, 2)}{' '}
+            {units.precipitation.accumulation}
           </span>
-        </li>
+        </li>}
       </ul>
       <ul>
         <li title="Wind Speed">
