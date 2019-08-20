@@ -88,9 +88,31 @@ a {
   }
   .location-info h3 {
     flex: 1;
-    margin-left: 1rem;
+    margin: 0 1rem;
     font-size: 1.3rem;
     font-weight: normal;
+  }
+  .location-info .options {
+    display: flex;
+    align-items: center;
+  }
+  .location-info .options a {
+    display: inline-block;
+    border-radius: 0.75rem;
+    padding: 0 .5rem;
+    background: rgba(135, 143, 154, .3);
+    color: black;
+    font-size: .8rem;
+    letter-spacing: .05rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: background .2s;
+  }
+  .location-info .options a:hover, .location-info .options a:focus {
+    background: rgba(135, 143, 154, .4);
+  }
+  .location-info .options a:active {
+    background: rgba(135, 143, 154, .5);
 }
 
 .timeline-wrapper {

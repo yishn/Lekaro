@@ -11,12 +11,12 @@ export default class StateContainer extends Component {
       error: true,
       locationInfo: {},
       forecastData: {},
-      units: 'si',
+      units: localStorage.getItem('lekaro.units') || 'si',
       selectedTime: Math.round(new Date().getTime() / 1000)
     }
   }
 
-  loadForecastFromURL = (options = {}) => {
+  loadForecastFromURL = async (options = {}) => {
     let {hash} = window.location
 
     if (hash != null && hash.length > 1) {
@@ -26,14 +26,20 @@ export default class StateContainer extends Component {
         })
       } else {
         let coordinates = hash.slice(1).split(',').slice(0, 2).reverse()
-        this.loadForecast({coordinates, ...options})
+        await this.loadForecast({coordinates, ...options})
       }
     } else {
-      this.loadForecast(options)
+      await this.loadForecast(options)
     }
   }
 
-  loadForecast = async ({name, coordinates, replaceHistory = false, pushHistory = true} = {}) => {
+  loadForecast = async ({
+    name,
+    coordinates,
+    units = this.state.units,
+    replaceHistory = false,
+    pushHistory = true
+  } = {}) => {
     this.setState({loading: true})
 
     if (name == null && coordinates == null) {
@@ -64,7 +70,7 @@ export default class StateContainer extends Component {
       let response = await fetch(`/forecast?${qs({
         lat: coordinates[1],
         lon: coordinates[0],
-        units: this.state.units
+        units
       })}`)
 
       if (!response.ok) throw new Error()
@@ -93,12 +99,21 @@ export default class StateContainer extends Component {
     }
   }
 
+  refreshForecast = async (options = {}) => {
+    await this.loadForecastFromURL({pushHistory: false, ...options})
+  }
+
   selectTime = timestamp => {
     this.setState({selectedTime: timestamp})
   }
 
-  selectUnits = units => {
-    this.setState({units})
+  selectUnits = async units => {
+    if (units !== this.state.units) {
+      await this.refreshForecast({units})
+
+      localStorage.setItem('lekaro.units', units)
+      this.setState({units})
+    }
   }
 
   render() {

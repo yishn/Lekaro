@@ -79,6 +79,10 @@ export default class App extends Component {
     this.actions.loadForecast()
   }
 
+  handleUnitsButtonClick = () => {
+    this.actions.selectUnits(this.props.units === 'si' ? 'us' : 'si')
+  }
+
   handleTimelineWrapperWheel = evt => {
     if (evt.deltaY !== 0) {
       evt.preventDefault()
@@ -237,12 +241,14 @@ export default class App extends Component {
         inputRef={el => this.inputElement = el}
 
         loading={loading}
+        units={units}
         city={error ? '' : locationInfo.address && locationInfo.address.city}
         state={error ? '' : locationInfo.address && locationInfo.address.state}
         country={error ? '' : locationInfo.address && locationInfo.address.country}
 
         onSearch={this.handleSearch}
         onCurrentLocationClick={this.handleCurrentLocationClick}
+        onUnitsButtonClick={this.handleUnitsButtonClick}
       />
 
       <div class="timeline-wrapper" onWheel={this.handleTimelineWrapperWheel}>

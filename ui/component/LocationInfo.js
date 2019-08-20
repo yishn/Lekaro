@@ -66,8 +66,15 @@ export default class LocationInfo extends Component {
     onCurrentLocationClick(evt)
   }
 
+  handleUnitsButtonClick = evt => {
+    evt.preventDefault()
+
+    let {onUnitsButtonClick = () => {}} = this.props
+    onUnitsButtonClick(evt)
+  }
+
   render() {
-    let {inputRef, loading, state, country} = this.props
+    let {inputRef, units, loading, state, country} = this.props
 
     return <div class={classnames('location-info', {loading})}>
       <h2>
@@ -93,9 +100,22 @@ export default class LocationInfo extends Component {
           onClick={this.handleCurrentLocationClick}
         >
           <CurrentLocationIcon viewBox="0 0 24 24"/>
-        </a>{' '}
+        </a>
 
         <h3>{([state, country].filter(x => !!x).join(', ') || 'Unknown')}</h3>
+
+        <div class="options">
+          <a
+            class="units"
+            href="#"
+            title="Change Units"
+            onClick={this.handleUnitsButtonClick}
+          >{
+            units === 'si' ? 'Metric'
+            : units === 'us' ? 'Imperial'
+            : 'Unknown'
+          }</a>
+        </div>
       </div>
     </div>
   }
