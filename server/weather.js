@@ -6,25 +6,35 @@ let cache = {}
 
 async function darkSkyRequest(path, options = {}) {
   let key = JSON.stringify([Math.round(new Date().getTime() / 1000 / 60), path, options])
-  if (key in cache) return cache[key]
 
-  console.log('info: Request Dark Sky', path, options)
+  if (cache[key] == null) {
+    cache[key] = (async () => {
+      console.log('info: Request Dark Sky', path, options)
 
-  let response = await fetch(
-    `https://api.darksky.net/forecast/${config.darkSkyApiKey}${path}?${qs(options)}`,
-    {compress: true}
-  )
+      let response = await fetch(
+        `https://api.darksky.net/forecast/${config.darkSkyApiKey}${path}?${qs(options)}`,
+        {compress: true}
+      )
 
-  if (!response.ok) throw new Error(body.error);
+      if (!response.ok) throw new Error(body.error);
 
-  let body = await response.json()
+      let body = await response.json()
 
-  cache[key] = body
-  setTimeout(() => {
+      setTimeout(() => {
+        delete cache[key]
+      }, 60 * 1000 /* 1 min */)
+
+      return body
+    })()
+  }
+
+  try {
+    let result = await cache[key]
+    return result
+  } catch (err) {
     delete cache[key]
-  }, 60 * 1000 /* 1 min */)
-
-  return body
+    throw err
+  }
 }
 
 function transformDarkSkyResponse(response) {
