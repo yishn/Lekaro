@@ -4,7 +4,7 @@ import scrollIntoView from 'scroll-into-view-if-needed'
 import SmoothInterpolatingCurve from './SmoothInterpolatingCurve.js'
 import * as time from '../time.js'
 
-export function getPlaceholderProps({columns = 7 * 24 + 6} = {}) {
+export function getPlaceholderProps({columns = 7 * 24 + 1} = {}) {
   let now = Math.round(new Date().getTime() / 1000)
   let columnArray = [...Array(columns)].map((_, i) => i)
   let timeArray = columnArray.map(i => time.fromUnixTimestamp(now + i * 60 * 60))
@@ -15,12 +15,12 @@ export function getPlaceholderProps({columns = 7 * 24 + 6} = {}) {
   let zeroes = columnArray.map(_ => 0)
 
   return {
-    columns: 7 * 24 + 6,
+    columns,
     tickLabels: columnArray.map(_ => ''),
     nightColumns: [...Array(8)].map((_, i) => ({
       key: timeArray[i * 24] && timeArray[i * 24].toFormat('DDD'),
       start: i * 24,
-      end: 6 + i * 24,
+      end: Math.min(6 + i * 24, columns),
       moonPhase: 0
     })),
     uvIndex: zeroes,
@@ -50,7 +50,7 @@ function NightBackground({columnWidth, width, nightColumns}) {
           width: Math.ceil((end - start) * columnWidth)
         }}
       >
-        {moonPhase != null && end - start >= 1 &&
+        {moonPhase != null && end - start >= 1.5 &&
           <svg class="moon" style={{width: '1.2rem', height: '1.2rem'}} viewBox="0 0 1 1">
             <title>
               {moonPhase === 0 ? 'New Moon'
