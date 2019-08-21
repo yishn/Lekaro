@@ -2,41 +2,11 @@ import {h, Component} from 'preact'
 import {useMemo} from 'preact/hooks'
 import {Duration} from 'luxon'
 import * as time from '../time.js'
+import {unitsData} from '../data.js'
 import LocationInfo from './LocationInfo.js'
 import WeatherTimeline, {getPlaceholderProps} from './WeatherTimeline.js'
 import WeatherDetails from './WeatherDetails.js'
 import FooterArea from './FooterArea.js'
-
-const unitsData = {
-  'si': {
-    precipitation: {
-      intensity: 'mm/h',
-      accumulation: 'cm'
-    },
-    temperature: '°C',
-    apparentTemperature: '°C',
-    dewPoint: '°C',
-    windSpeed: 'm/s',
-    windGust: 'm/s',
-    ozone: 'DU',
-    pressure: 'hPa',
-    visibility: 'km'
-  },
-  'us': {
-    precipitation: {
-      intensity: 'iph',
-      accumulation: 'in'
-    },
-    temperature: '°F',
-    apparentTemperature: '°F',
-    dewPoint: '°F',
-    windSpeed: 'mph',
-    windGust: 'mph',
-    ozone: 'DU',
-    pressure: 'mb',
-    visibility: 'mi'
-  }
-}
 
 export default class App extends Component {
   componentDidMount() {
