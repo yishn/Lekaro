@@ -90,11 +90,8 @@ a {
   .location-info h3 {
     flex: 1;
     margin: 0 1rem;
-    overflow: hidden;
     font-size: 1.3rem;
     font-weight: normal;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
   .location-info .options {
     display: flex;
@@ -120,10 +117,20 @@ a {
 }
 
 .timeline-wrapper {
-  position: relative;
-  overflow: auto;
-  z-index: 1;
+    position: relative;
+    overflow: auto;
+    z-index: 1;
+  }
+  .timeline-wrapper::-webkit-scrollbar {
+    height: .5rem;
+  }
+  .timeline-wrapper::-webkit-scrollbar-track {
+    background: #F9F6DE;
+  }
+  .timeline-wrapper::-webkit-scrollbar-thumb {
+    background: #B43F5A;
 }
+
 
 .weather-timeline {
     position: relative;
