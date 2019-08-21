@@ -5,6 +5,7 @@ import * as time from '../time.js'
 import LocationInfo from './LocationInfo.js'
 import WeatherTimeline, {getPlaceholderProps} from './WeatherTimeline.js'
 import WeatherDetails from './WeatherDetails.js'
+import FooterArea from './FooterArea.js'
 
 const unitsData = {
   'si': {
@@ -326,6 +327,8 @@ export default class App extends Component {
           precipAccumulation={selectedHourPrecipitation.accumulation}
         />
       }
+
+      <FooterArea/>
     </div>
   }
 }

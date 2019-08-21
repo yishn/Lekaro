@@ -458,3 +458,10 @@ a {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.footer-area {
+  padding: .5rem 1rem;
+  font-size: .7rem;
+  opacity: .8;
+  text-align: center;
+}
