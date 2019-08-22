@@ -224,8 +224,8 @@ function TemperatureGraph({columnWidth, graphHeight, width, temperature, apparen
   let helperLineStep = 5
   let helperLineCount = (max - min) / helperLineStep + 1
 
-  while (helperLineCount >= 7) {
-    helperLineStep += 5
+  while (helperLineCount > 7) {
+    helperLineStep += helperLineStep === 5 ? 5 : 10
     let mod = x => (x % helperLineStep + helperLineStep) % helperLineStep
 
     min = min - mod(min)
