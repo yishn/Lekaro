@@ -276,7 +276,7 @@ a {
     position: absolute;
     left: 0;
     bottom: .5rem;
-    width: 1;
+    width: 1px;
     height: .3rem;
     background: #888;
   }
