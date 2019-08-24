@@ -391,15 +391,35 @@ function MainLabels({columnWidth, labels}) {
 }
 
 export default class WeatherTimeline extends Component {
+  componentDidMount() {
+    this.scrollContainer = this.getScrollContainer()
+  }
+
   componentDidUpdate(prevProps) {
     if (
       prevProps.selectedColumn !== this.props.selectedColumn
       && this.props.selectedColumn != null
     ) {
       clearTimeout(this.scrollIntoViewTimeoutId)
+
       this.scrollIntoViewTimeoutId = setTimeout(() => {
-        scrollIntoView(this.element.querySelector('.selected'))
+        scrollIntoView(this.element.querySelector('.selected'), {
+          behavior: 'smooth',
+          boundary: this.scrollContainer
+        })
       }, 100)
+    }
+  }
+
+  getScrollContainer(node = this.element) {
+    if (node == null) {
+      return null;
+    }
+
+    if (node.scrollWidth > node.clientWidth) {
+      return node;
+    } else {
+      return this.getScrollContainer(node.parentNode);
     }
   }
 
