@@ -77,10 +77,11 @@ a {
   }
   .location-info .toolbar {
     display: flex;
-    flex-wrap: wrap;
+    align-items: flex-start;
   }
   .location-info .currentlocation {
     display: flex;
+    height: 1.95rem;
   }
   .location-info .currentlocation svg {
     align-self: center;
@@ -96,6 +97,7 @@ a {
   .location-info .options {
     display: flex;
     align-items: center;
+    height: 1.95rem;
   }
   .location-info .options a {
     display: inline-block;
@@ -430,7 +432,7 @@ a {
   }
   .weather-details ul {
     width: 7rem;
-    min-width: 4rem;
+    min-width: 6rem;
     max-width: calc(20% - 1rem);
     margin: 0 .5rem;
     list-style: none;
