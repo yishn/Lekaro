@@ -403,25 +403,29 @@ export default class WeatherTimeline extends Component {
     }
   }
 
+  handleClick = evt => {
+    evt.preventDefault()
+    this.element.focus()
+
+    let {columnWidth = 24, tickLabels = []} = this.props
+    let {left} = this.element.getBoundingClientRect()
+    let paddingLeft = this.element.querySelector('.graph').offsetLeft
+    let column = Math.floor((evt.clientX - left - paddingLeft) / columnWidth)
+
+    if (
+      column !== this.props.selectedColumn
+      && column >= 0
+      && column < tickLabels.length
+    ) {
+      let {onColumnClick = () => {}} = this.props
+
+      onColumnClick({column})
+    }
+  }
+
   handleMouseDown = evt => {
     if (evt.buttons === 1) {
-      evt.preventDefault()
-      this.element.focus()
-
-      let {columnWidth = 24, tickLabels = []} = this.props
-      let {left} = this.element.getBoundingClientRect()
-      let paddingLeft = this.element.querySelector('.graph').offsetLeft
-      let column = Math.floor((evt.clientX - left - paddingLeft) / columnWidth)
-
-      if (
-        column !== this.props.selectedColumn
-        && column >= 0
-        && column < tickLabels.length
-      ) {
-        let {onColumnClick = () => {}} = this.props
-
-        onColumnClick({column})
-      }
+      this.handleClick(evt)
     }
   }
 
@@ -477,6 +481,7 @@ export default class WeatherTimeline extends Component {
 
       onMouseMove={this.handleMouseDown}
       onMouseDown={this.handleMouseDown}
+      onClick={this.handleClick}
       onKeyDown={this.handleKeyDown}
     >
       <NightBackground
