@@ -12,7 +12,7 @@ export default class StateContainer extends Component {
       locationInfo: {},
       forecastData: {},
       units: localStorage.getItem('lekaro.units') || 'si',
-      selectedTime: Math.round(new Date().getTime() / 1000)
+      selectedTime: Math.round(Date.now() / 1000)
     }
   }
 
