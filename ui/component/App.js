@@ -92,6 +92,7 @@ export default class App extends Component {
 
     let hourlyTimestamps = (forecastData.hourly || []).map(entry => entry.time)
     let dailyTimestamps = (forecastData.daily || []).map(entry => entry.time)
+    let alertTimestamps = (forecastData.alerts || []).map(entry => [entry.time, entry.expires])
 
     let hourlyTimes = useMemo(() => {
       return hourlyTimestamps.map(timestamp =>
@@ -104,6 +105,14 @@ export default class App extends Component {
         time.fromUnixTimestamp(timestamp, forecastData.timezone)
       )
     }, [...dailyTimestamps, forecastData.timezone])
+
+    let alertTimes = useMemo(() => {
+      return alertTimestamps.map(arr =>
+        arr.map(timestamp =>
+          time.fromUnixTimestamp(timestamp, forecastData.timezone)
+        )
+      )
+    }, [...[].concat(...alertTimestamps), forecastData.timezone])
 
     let nightColumns = forecastData.daily && forecastData.hourly &&
       [...forecastData.daily, null]
@@ -225,6 +234,21 @@ export default class App extends Component {
         onCurrentLocationClick={this.handleCurrentLocationClick}
         onUnitsButtonClick={this.handleUnitsButtonClick}
       />
+
+      {forecastData.alerts && forecastData.alerts.map((alert, i) =>
+        <AlertStrip
+          severity={alert.severity}
+          uri={alert.uri}
+          title={alert.title}
+          meta={
+            alertTimes[i]
+            .map(dateTime => dateTime.toFormat('cccc, d LLLL yyyy HH:mm'))
+            .join(' – ')
+          }
+          description={alert.description}
+          regions={alert.regions}
+        />
+      )}
 
       <div class="timeline-wrapper" onWheel={this.handleTimelineWrapperWheel}>
         {!error ? <WeatherTimeline

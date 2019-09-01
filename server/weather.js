@@ -38,7 +38,7 @@ async function darkSkyRequest(path, options = {}) {
 }
 
 function transformDarkSkyResponse(response) {
-  let {currently, minutely, hourly, daily} = response
+  let {currently, minutely, hourly, daily, alerts} = response
   if (minutely == null) minutely = {data: []}
 
   minutely.data = minutely.data.filter(entry => entry.time > currently.time)
@@ -66,6 +66,7 @@ function transformDarkSkyResponse(response) {
   return {
     license: 'Powered by Dark Sky',
     timezone: response.timezone,
+    alerts,
     precipitation,
     hourly: [currently, ...hourly.data]
       .map(entry => extract([
