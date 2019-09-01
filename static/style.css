@@ -145,6 +145,7 @@ a {
   }
   .alert-strip .description {
     margin: .5rem 0;
+    white-space: pre-line;
   }
   .alert-strip .regions {
     list-style: square;
