@@ -193,17 +193,19 @@ export default class App extends Component {
         intensity: max('intensity'),
         accumulation: max('accumulation'),
         probability: max('probability'),
-        type: (Object.entries(
-          entries
-          .filter(x => x.type != null)
-          .map(x => x.type)
-          .reduce((acc, type) => {
-            acc[type] = (acc[type] || 0) + 1
-            return acc
-          }, {})
-        ).find(([_, count], __, arr) =>
-          arr.every(([_, count2]) => count >= count2)
-        ) || {})[0]
+        type: (
+          Object.entries(
+            entries
+            .filter(x => x.type != null)
+            .map(x => x.type)
+            .reduce((acc, type) => {
+              acc[type] = (acc[type] || 0) + 1
+              return acc
+            }, {})
+          ).find(([_, count], __, arr) =>
+            arr.every(([_, count2]) => count >= count2)
+          ) || {}
+        )[0]
       }
     })() || {}
 

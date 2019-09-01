@@ -12,7 +12,8 @@ body {
   --accent-color-3: #4B1D37;
   --accent-color-4: #70575B;
   --accent-color-5: #a3c1a6;
-  --accent-color-6: #EC5E19;
+  --accent-color-6: rgb(236, 94, 25);
+  --accent-color-6-70: rgb(242, 142, 94);
   --accent-color-6-40: #E0A78C;
   --accent-color-7: #4579b9;
 
@@ -116,6 +117,44 @@ a {
   }
   .location-info .options a:active {
     background: rgba(135, 143, 154, .5);
+}
+
+.alert-strip {
+    position: relative;
+    display: grid;
+    grid-template: 1fr / auto 1fr;
+    column-gap: 1rem;
+    border-bottom: 3px solid #B01409;
+    padding: 1rem;
+    background: #D1361B;
+    color: #eee;
+    z-index: 1;
+  }
+  .alert-strip .icon {
+    width: 24px;
+    height: 24px;
+  }
+  .alert-strip a {
+    color: #fff;
+  }
+  .alert-strip .meta, .alert-strip .regions {
+    font-size: .7em;
+  }
+  .alert-strip .meta {
+    opacity: .8;
+  }
+  .alert-strip .description {
+    margin: .5rem 0;
+  }
+  .alert-strip .regions {
+    list-style: square;
+    overflow: hidden;
+  }
+  .alert-strip .regions li {
+    float: left;
+  }
+  .alert-strip .regions li + li {
+    margin-left: 1.7rem;
 }
 
 .timeline-wrapper {
