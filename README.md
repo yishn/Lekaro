@@ -2,7 +2,7 @@
 
 <img src="./logo.svg" width="126" height="126"/>
 
-A modern UI for displaying weather forecasts
+A modern UI for displaying Dark Sky weather forecasts. [Try it out here](https://lekaro.yishn.uber.space).
 
 ![Screenshot](./screenshot.png)
 
