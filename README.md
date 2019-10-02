@@ -11,8 +11,8 @@ A modern UI for displaying Dark Sky weather forecasts. [Try it out here](https:/
 Building requires Node.js and npm. First, clone this repository and install all the dependencies:
 
 ~~~
-$ git clone https://github.com/yishn/p2p-goban
-$ cd p2p-goban
+$ git clone https://github.com/yishn/Lekaro
+$ cd Lekaro
 $ npm install
 ~~~
 
