@@ -158,6 +158,7 @@ function LabeledTicks({columnWidth, labels, showLabels, labelPosition, nightColu
 
 function CloudBar({columnWidth, units, cloudCover, precipitation}) {
   let percent = p => `${Math.round(p * 100)}%`
+  let avg = (x, y) => (x + y) / 2
 
   let getCloudCoverDescription = i => {
     return `${percent(cloudCover[i])}: ${(
@@ -169,14 +170,29 @@ function CloudBar({columnWidth, units, cloudCover, precipitation}) {
   }
 
   return <ol class="cloud-bar" style={{width: cloudCover.length * columnWidth}}>
-    {cloudCover.map((cover, i) =>
-      <li
+    {cloudCover.map((cover, i) => {
+      let prevCover = i === 0 ? cover : cloudCover[i - 1]
+      let nextCover = i === cloudCover.length - 1 ? cover : cloudCover[i + 1]
+
+      return <li
         style={{flexBasis: columnWidth}}
         title={getCloudCoverDescription(i)}
       >
-        <div class="cover" style={{opacity: cover}}>{getCloudCoverDescription(i)}</div>
+        <div
+          class="cover"
+          style={{
+            background: `linear-gradient(
+              to right,
+              rgba(135, 143, 154, ${avg(prevCover, cover)}),
+              rgba(135, 143, 154, ${cover}),
+              rgba(135, 143, 154, ${avg(nextCover, cover)})
+            )`
+          }}
+        >
+          {getCloudCoverDescription(i)}
+        </div>
       </li>
-    )}
+    })}
   </ol>
 }
 

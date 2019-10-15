@@ -431,7 +431,6 @@ a {
     overflow: hidden;
     background: rgb(135, 143, 154);
     text-indent: -9999rem;
-    transition: opacity .2s;
 }
 
 .main-labels {
