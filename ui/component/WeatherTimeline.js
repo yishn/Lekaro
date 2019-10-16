@@ -204,17 +204,38 @@ function PrecipitationGraph({columnWidth, graphHeight, width, precipitation, hum
   let pxs = precipitation.map(entry => entry.x * columnWidth)
   let pys = precipitation.map(entry => entry.probability * graphHeight)
 
+  let precipMaxIntensity = Math.max(...precipitation.map(entry => entry.intensity))
+  let precipRelIntensities = precipitation.map(entry => Math.min(entry.intensity / precipMaxIntensity, 1))
+  let precipMinColor = [69, 121, 185]
+  let precipMaxColor = [27, 44, 130]
+
   return <div class="precipitation-graph">
     <svg
       width={width}
       height={graphHeight}
     >
+      <defs>
+        <linearGradient id="probabilityGradient">
+          {pxs.map((x, i) =>
+            <stop
+              offset={x / width}
+              stop-color={`rgb(${
+                precipMinColor
+                .map((x, j) => (1 - precipRelIntensities[i]) * x + precipRelIntensities[i] * precipMaxColor[j])
+                .join(', ')
+              })`}
+            />
+          )}
+        </linearGradient>
+      </defs>
+
       <SmoothInterpolatingCurve
         xs={[0, ...pxs]}
         ys={[pys[0], ...pys]}
         additionalPoints={[[width, pys.slice(-1)[0]], [width, 0], [0, 0]]}
         innerProps={{
-          class: 'probability'
+          class: 'probability',
+          fill: `url('#probabilityGradient')`
         }}
       />
       <SmoothInterpolatingCurve

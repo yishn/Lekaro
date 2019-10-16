@@ -15,7 +15,7 @@ body {
   --accent-color-6: rgb(236, 94, 25);
   --accent-color-6-70: rgb(242, 142, 94);
   --accent-color-6-40: #E0A78C;
-  --accent-color-7: #4579b9;
+  --accent-color-7: rgb(69, 121, 185);
 
   font: 100%/1.5 Oxygen, sans-serif;
   color: #333;
@@ -243,15 +243,12 @@ a {
 }
 
 .precipitation-graph .probability {
-    fill: var(--accent-color-7);
     stroke: var(--accent-color-7);
-    stroke-width: 3;
+    stroke-width: 2;
     opacity: .9;
   }
   .precipitation-graph .humidity {
     fill: var(--accent-color-5);
-    stroke: var(--accent-color-5);
-    stroke-width: 3;
     opacity: .3;
 }
 
