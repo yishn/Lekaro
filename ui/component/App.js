@@ -312,6 +312,7 @@ export default class App extends Component {
           temperature={selectedHour.temperature}
           apparentTemperature={selectedHour.apparentTemperature}
           dewPoint={selectedHour.dewPoint}
+          cloudCover={selectedHour.cloudCover}
           humidity={selectedHour.humidity}
           ozone={selectedHour.ozone}
           pressure={selectedHour.pressure}

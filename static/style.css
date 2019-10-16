@@ -495,6 +495,9 @@ a {
   .weather-details li.dewpoint .icon {
     fill: var(--accent-color-5);
   }
+  .weather-details li.cloudcover .icon {
+    fill: rgb(135, 143, 154);
+  }
   .weather-details li.humidity .icon {
     fill: var(--accent-color-5)
   }

@@ -38,6 +38,7 @@ export default class WeatherDetails extends Component {
       temperature,
       apparentTemperature,
       dewPoint,
+      cloudCover,
       humidity,
       ozone,
       pressure,
@@ -70,6 +71,10 @@ export default class WeatherDetails extends Component {
         </li>
       </ul>
       <ul>
+        <li class="cloudcover" title="Cloud Cover">
+          <AreaIcon class="icon"/>
+          <span class="text">{round(cloudCover * 100)}%</span>
+        </li>
         <li
           class="precipitation"
           title={`${precipType != null ? capitalize(precipType) : 'Precipitation'} Probability`}
