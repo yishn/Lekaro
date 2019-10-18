@@ -214,30 +214,35 @@ function PrecipitationGraph({columnWidth, graphHeight, width, precipitation, hum
       width={width}
       height={graphHeight}
     >
-      <defs>
-        <linearGradient id="probabilityGradient">
-          {pxs.map((x, i) =>
-            <stop
-              offset={x / width}
-              stop-color={`rgb(${
-                precipMinColor
-                .map((x, j) => (1 - precipRelIntensities[i]) * x + precipRelIntensities[i] * precipMaxColor[j])
-                .join(', ')
-              })`}
-            />
-          )}
-        </linearGradient>
-      </defs>
+      <mask id="probabilityMask">
+        <SmoothInterpolatingCurve
+          xs={[0, ...pxs]}
+          ys={[pys[0], ...pys]}
+          additionalPoints={[[width, pys.slice(-1)[0]], [width, 0], [0, 0]]}
+          innerProps={{
+            fill: 'white',
+            stroke: 'white',
+            'stroke-width': 3
+          }}
+        />
+      </mask>
 
-      <SmoothInterpolatingCurve
-        xs={[0, ...pxs]}
-        ys={[pys[0], ...pys]}
-        additionalPoints={[[width, pys.slice(-1)[0]], [width, 0], [0, 0]]}
-        innerProps={{
-          class: 'probability',
-          fill: `url('#probabilityGradient')`
-        }}
-      />
+      <g class="probability" mask="url('#probabilityMask')">
+        {pxs.map((x, i) => {
+          let color = precipMinColor.map((x, j) =>
+            (1 - precipRelIntensities[i]) * x + precipRelIntensities[i] * precipMaxColor[j]
+          )
+
+          return <rect
+            x={x}
+            y="0"
+            width={columnWidth}
+            height={graphHeight}
+            fill={`rgb(${color.join(', ')})`}
+          />
+        })}
+      </g>
+
       <SmoothInterpolatingCurve
         xs={xs}
         ys={hys}

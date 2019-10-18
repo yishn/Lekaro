@@ -243,8 +243,6 @@ a {
 }
 
 .precipitation-graph .probability {
-    stroke: var(--accent-color-7);
-    stroke-width: 2;
     opacity: .9;
   }
   .precipitation-graph .humidity {
