@@ -7,7 +7,7 @@
 }
 
 body {
-  --accent-color-1: #F9F6DE;
+  --accent-color-1: #f8f6e8;
   --accent-color-2: #B43F5A;
   --accent-color-3: #4B1D37;
   --accent-color-4: #70575B;
@@ -242,12 +242,9 @@ a {
   height: 100%;
 }
 
-.precipitation-graph .probability {
-    opacity: .9;
-  }
-  .precipitation-graph .humidity {
-    fill: var(--accent-color-5);
-    opacity: .3;
+.precipitation-graph .humidity {
+  fill: var(--accent-color-5);
+  opacity: .3;
 }
 
 .temperature-graph .helperlines {
