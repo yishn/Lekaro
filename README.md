@@ -6,7 +6,7 @@ A modern UI for displaying Dark Sky weather forecasts. [Try it out here](https:/
 
 ![Screenshot](./screenshot.png)
 
-## Bullding
+## Building
 
 Building requires Node.js and npm. First, clone this repository and install all the dependencies:
 
