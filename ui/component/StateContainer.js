@@ -123,8 +123,10 @@ export default class StateContainer extends Component {
       {...this.state}
 
       ref={x => {
-        x.actions = this
-        window.App = x
+        if (x != null) {
+          x.actions = this
+          window.App = x
+        }
       }}
     />
   }
