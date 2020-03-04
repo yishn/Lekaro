@@ -1,4 +1,5 @@
-import {h, Component} from 'preact'
+import {h} from 'preact'
+import {useEffect, useRef, useCallback} from 'preact/hooks'
 import classnames from 'classnames'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import SmoothInterpolatingCurve from './SmoothInterpolatingCurve.js'
@@ -533,234 +534,230 @@ function MainLabels({columnWidth, labels}) {
   )
 }
 
-export default class WeatherTimeline extends Component {
-  componentDidMount() {
-    this.scrollContainer = this.getScrollContainer()
+export default function WeatherTimeline({
+  style = {},
+  columnWidth = 24,
+  graphHeight = 150,
+  selectedColumn = null,
+  tickLabels = [],
+  labels = [],
+  units = {precipitation: {}},
+  uvIndex = [],
+  nightColumns = [],
+  cloudCover = [],
+  humidity = [],
+  temperature = [],
+  apparentTemperature = [],
+  dewPoint = [],
+  precipitation = [],
+  onColumnClick = () => {}
+}) {
+  let width = columnWidth * tickLabels.length
+
+  let graphProps = {
+    columnWidth,
+    graphHeight,
+    width
   }
 
-  componentDidUpdate(prevProps) {
-    if (
-      prevProps.selectedColumn !== this.props.selectedColumn &&
-      this.props.selectedColumn != null
-    ) {
-      clearTimeout(this.scrollIntoViewTimeoutId)
+  let elementRef = useRef()
+  let scrollContainerRef = useRef(null)
+  let scrollColumnIntoViewTimeoutIdRef = useRef(null)
 
-      this.scrollIntoViewTimeoutId = setTimeout(() => {
-        scrollIntoView(this.element.querySelector('.selected'), {
-          behavior: 'smooth',
-          boundary: this.scrollContainer
-        })
-      }, 100)
-    }
-  }
+  useEffect(function getRefs() {
+    function findScrollContainer(node) {
+      if (node == null) {
+        return null
+      }
 
-  getScrollContainer(node = this.element) {
-    if (node == null) {
-      return null
+      if (node.scrollWidth > node.clientWidth) {
+        return node
+      } else {
+        return findScrollContainer(node.parentNode)
+      }
     }
 
-    if (node.scrollWidth > node.clientWidth) {
-      return node
-    } else {
-      return this.getScrollContainer(node.parentNode)
-    }
-  }
+    scrollContainerRef.current = findScrollContainer(elementRef.current)
+  }, [])
 
-  selectColumnByClientX(clientX) {
-    this.element.focus()
+  useEffect(
+    function scrollColumnIntoView() {
+      if (selectedColumn != null) {
+        clearTimeout(scrollColumnIntoViewTimeoutIdRef.current)
 
-    let {columnWidth = 24, tickLabels = []} = this.props
-    let {left} = this.element.getBoundingClientRect()
-    let paddingLeft = this.element.querySelector('.graph').offsetLeft
+        scrollColumnIntoViewTimeoutIdRef.current = setTimeout(() => {
+          scrollIntoView(elementRef.current.querySelector('.selected'), {
+            behavior: 'smooth',
+            boundary: scrollContainerRef.current
+          })
+        }, 100)
+      }
+    },
+    [selectedColumn]
+  )
+
+  let selectColumnDeps = [
+    columnWidth,
+    tickLabels.length,
+    selectedColumn,
+    onColumnClick
+  ]
+
+  let selectColumnByClientX = useCallback(clientX => {
+    elementRef.current.focus()
+
+    let {left} = elementRef.current.getBoundingClientRect()
+    let paddingLeft = elementRef.current.querySelector('.graph').offsetLeft
     let column = Math.floor((clientX - left - paddingLeft) / columnWidth)
 
     if (
-      column !== this.props.selectedColumn &&
+      column !== selectedColumn &&
       column >= 0 &&
       column < tickLabels.length
     ) {
-      let {onColumnClick = () => {}} = this.props
-
       onColumnClick({column})
     }
-  }
+  }, selectColumnDeps)
 
-  handleTouchStart = evt => {
-    let touch = evt.touches.item(0)
-    if (touch == null) return
-
-    this.selectColumnByClientX(touch.clientX)
-  }
-
-  handleMouseMove = evt => {
+  let handleMouseMove = useCallback(evt => {
     if (evt.buttons === 1) {
       evt.preventDefault()
 
-      this.selectColumnByClientX(evt.clientX)
+      selectColumnByClientX(evt.clientX)
     }
-  }
+  }, selectColumnDeps)
 
-  handleKeyDown = evt => {
-    if (evt.key === 'ArrowLeft' || evt.key === 'ArrowRight') {
-      evt.preventDefault()
+  return (
+    <div
+      ref={elementRef}
+      class="weather-timeline"
+      style={{...style, boxSizing: 'content-box', width}}
+      tabIndex="0"
+      onMouseMove={handleMouseMove}
+      onMouseDown={handleMouseMove}
+      onTouchStart={useCallback(evt => {
+        let touch = evt.touches.item(0)
+        if (touch == null) return
 
-      let step = evt.key === 'ArrowLeft' ? -1 : 1
-      let {
-        selectedColumn,
-        tickLabels = [],
-        onColumnClick = () => {}
-      } = this.props
+        selectColumnByClientX(touch.clientX)
+      }, selectColumnDeps)}
+      onKeyDown={useCallback(
+        evt => {
+          if (['ArrowLeft', 'ArrowRight'].includes(evt.key)) {
+            evt.preventDefault()
 
-      if (selectedColumn == null) selectedColumn = 0
+            let step = evt.key === 'ArrowLeft' ? -1 : 1
+            if (selectedColumn == null) selectedColumn = 0
 
-      onColumnClick({
-        column: Math.max(
-          0,
-          Math.min(selectedColumn + step, tickLabels.length - 1)
-        )
-      })
-    }
-  }
+            onColumnClick({
+              column: Math.max(
+                0,
+                Math.min(selectedColumn + step, tickLabels.length - 1)
+              )
+            })
+          }
+        },
+        [selectedColumn, tickLabels.length, onColumnClick]
+      )}
+    >
+      <NightBackground
+        columnWidth={columnWidth}
+        width={width}
+        nightColumns={nightColumns}
+      />
 
-  render() {
-    let {
-      innerProps = {},
-      style = {},
-      columnWidth = 24,
-      graphHeight = 150,
-      selectedColumn = null,
-      tickLabels = [],
-      labels = [],
-      units = {precipitation: {}},
-      uvIndex = [],
-      nightColumns = [],
-      cloudCover = [],
-      humidity = [],
-      temperature = [],
-      apparentTemperature = [],
-      dewPoint = [],
-      precipitation = []
-    } = this.props
+      <SunBar columnWidth={columnWidth} uvIndex={uvIndex} />
 
-    let width = columnWidth * tickLabels.length
+      <LabeledTicks
+        columnWidth={columnWidth}
+        labels={tickLabels.map(_ => '')}
+        showLabels={false}
+        labelPosition="top"
+        nightColumns={nightColumns}
+      />
 
-    let graphProps = {
-      columnWidth,
-      graphHeight,
-      width
-    }
+      <CloudBar
+        columnWidth={columnWidth}
+        units={units}
+        cloudCover={cloudCover}
+        precipitation={precipitation
+          .reduce((acc, entry) => {
+            let index = Math.floor(entry.x)
 
-    return (
+            while (acc[index] == null) {
+              acc.push([])
+            }
+
+            acc[index].push(entry)
+            return acc
+          }, [])
+          .map(entries => {
+            let max = key => {
+              let result = Math.max(
+                ...entries.filter(x => x[key] != null).map(x => x[key])
+              )
+              return isFinite(result) ? result : undefined
+            }
+
+            return {
+              intensity: max('intensity'),
+              accumulation: max('accumulation'),
+              probability: max('probability'),
+              type: (Object.entries(
+                entries
+                  .filter(x => x.type != null)
+                  .map(x => x.type)
+                  .reduce((acc, type) => {
+                    acc[type] = (acc[type] || 0) + 1
+                    return acc
+                  }, {})
+              ).find(([_, count], __, arr) =>
+                arr.every(([_, count2]) => count >= count2)
+              ) || {})[0]
+            }
+          })}
+      />
+
       <div
-        {...innerProps}
-        ref={el => ((this.element = el), innerProps.ref && innerProps.ref(el))}
-        class="weather-timeline"
-        style={{...style, boxSizing: 'content-box', width}}
-        tabIndex="0"
-        onMouseMove={this.handleMouseMove}
-        onMouseDown={this.handleMouseMove}
-        onTouchStart={this.handleTouchStart}
-        onKeyDown={this.handleKeyDown}
+        class="graph"
+        style={{
+          width: columnWidth * tickLabels.length,
+          height: graphHeight
+        }}
       >
-        <NightBackground
-          columnWidth={columnWidth}
-          width={width}
-          nightColumns={nightColumns}
+        <PrecipitationGraph
+          {...graphProps}
+          precipitation={precipitation}
+          humidity={humidity}
         />
 
-        <SunBar columnWidth={columnWidth} uvIndex={uvIndex} />
-
-        <LabeledTicks
-          columnWidth={columnWidth}
-          labels={tickLabels.map(_ => '')}
-          showLabels={false}
-          labelPosition="top"
-          nightColumns={nightColumns}
+        <TemperatureGraph
+          {...graphProps}
+          temperature={temperature}
+          apparentTemperature={apparentTemperature}
+          dewPoint={dewPoint}
         />
-
-        <CloudBar
-          columnWidth={columnWidth}
-          units={units}
-          cloudCover={cloudCover}
-          precipitation={precipitation
-            .reduce((acc, entry) => {
-              let index = Math.floor(entry.x)
-
-              while (acc[index] == null) {
-                acc.push([])
-              }
-
-              acc[index].push(entry)
-              return acc
-            }, [])
-            .map(entries => {
-              let max = key => {
-                let result = Math.max(
-                  ...entries.filter(x => x[key] != null).map(x => x[key])
-                )
-                return isFinite(result) ? result : undefined
-              }
-
-              return {
-                intensity: max('intensity'),
-                accumulation: max('accumulation'),
-                probability: max('probability'),
-                type: (Object.entries(
-                  entries
-                    .filter(x => x.type != null)
-                    .map(x => x.type)
-                    .reduce((acc, type) => {
-                      acc[type] = (acc[type] || 0) + 1
-                      return acc
-                    }, {})
-                ).find(([_, count], __, arr) =>
-                  arr.every(([_, count2]) => count >= count2)
-                ) || {})[0]
-              }
-            })}
-        />
-
-        <div
-          class="graph"
-          style={{
-            width: columnWidth * tickLabels.length,
-            height: graphHeight
-          }}
-        >
-          <PrecipitationGraph
-            {...graphProps}
-            precipitation={precipitation}
-            humidity={humidity}
-          />
-
-          <TemperatureGraph
-            {...graphProps}
-            temperature={temperature}
-            apparentTemperature={apparentTemperature}
-            dewPoint={dewPoint}
-          />
-        </div>
-
-        <LabeledTicks
-          columnWidth={columnWidth}
-          labels={tickLabels}
-          showLabels={true}
-          labelPosition="bottom"
-          nightColumns={nightColumns}
-        />
-
-        <MainLabels columnWidth={columnWidth} labels={labels} />
-
-        {selectedColumn != null && (
-          <div
-            class="selected"
-            style={{
-              width: columnWidth,
-              transform: `translateX(${columnWidth * selectedColumn}px)`
-            }}
-          />
-        )}
       </div>
-    )
-  }
+
+      <LabeledTicks
+        columnWidth={columnWidth}
+        labels={tickLabels}
+        showLabels={true}
+        labelPosition="bottom"
+        nightColumns={nightColumns}
+      />
+
+      <MainLabels columnWidth={columnWidth} labels={labels} />
+
+      {selectedColumn != null && (
+        <div
+          class="selected"
+          style={{
+            width: columnWidth,
+            transform: `translateX(${columnWidth * selectedColumn}px)`
+          }}
+        />
+      )}
+    </div>
+  )
 }
