@@ -135,15 +135,7 @@ export default class StateContainer extends Component {
     let Component = this.props.component
 
     return (
-      <Component
-        {...this.state}
-        ref={x => {
-          if (x != null) {
-            x.actions = this
-            window.App = x
-          }
-        }}
-      />
+      <Component ref={x => (window.App = x)} actions={this} {...this.state} />
     )
   }
 }
