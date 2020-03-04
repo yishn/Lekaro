@@ -1,5 +1,5 @@
 import {h, Component} from 'preact'
-import {useMemo} from 'preact/hooks'
+import {useEffect, useMemo} from 'preact/hooks'
 import {Duration} from 'luxon'
 import * as time from '../time.js'
 import {unitsData} from '../data.js'
@@ -24,24 +24,9 @@ export default class App extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    document.title = this.title
-
     if (prevProps.loading && !this.props.loading && this.props.error) {
       this.inputElement.focus()
     }
-  }
-
-  get title() {
-    let result = ''
-
-    if (!this.props.error) {
-      let {city, state, country} = this.props.locationInfo.address || {}
-      result += `${[city, state, country].filter(x => !!x).join(', ')}`
-
-      if (result.trim() !== '') result += ' - '
-    }
-
-    return result + 'Lekaro Weather'
   }
 
   handleSearch = evt => {
@@ -245,6 +230,35 @@ export default class App extends Component {
           }
         })()) ||
       {}
+
+    useEffect(function updateTitle() {
+      let title = ''
+
+      if (!error) {
+        let {city, state, country} = locationInfo.address || {}
+        title += `${[city, state, country].filter(x => !!x).join(', ')}`
+
+        if (title.trim() !== '') title += ' — '
+      }
+
+      document.title = title + 'Lekaro Weather'
+    })
+
+    useEffect(
+      function updateDarkStyle() {
+        let dark =
+          nightColumns && nightColumns.length > 0 && nightColumns[0].start <= 0
+
+        if (dark != null) {
+          if (dark) {
+            document.body.classList.add('dark')
+          } else {
+            document.body.classList.remove('dark')
+          }
+        }
+      },
+      (nightColumns || []).slice(0, 1).map(x => x.start)
+    )
 
     return (
       <div class="lekaro-app">
