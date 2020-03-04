@@ -21,14 +21,17 @@ export function getMonotoneCubicInterpolation(xs, ys) {
   }
 
   let slopes = ys.map((y, i) =>
-    i === 0 || i === ys.length - 1 ? 0
-    : (ys[i + 1] - y) * (y - ys[i - 1]) <= 0 ? 0
-    : (ys[i + 1] - ys[i - 1]) / (xs[i + 1] - xs[i - 1])
+    i === 0 || i === ys.length - 1
+      ? 0
+      : (ys[i + 1] - y) * (y - ys[i - 1]) <= 0
+      ? 0
+      : (ys[i + 1] - ys[i - 1]) / (xs[i + 1] - xs[i - 1])
   )
 
   let splines = slopes.map((m, i) =>
-    i === 0 ? null
-    : createSpline(xs[i - 1], ys[i - 1], xs[i], ys[i], slopes[i - 1], m)
+    i === 0
+      ? null
+      : createSpline(xs[i - 1], ys[i - 1], xs[i], ys[i], slopes[i - 1], m)
   )
 
   return x0 => {

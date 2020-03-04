@@ -13,25 +13,29 @@ function route(func) {
       let result = await func(req, res)
 
       if (result !== undefined) {
-        res.send(result)
+        res.json(result)
       }
     } catch (err) {
       console.log('error:', err.stack)
-      res.status(500).type('text/plain').send(err.message)
+
+      res.status(500).json({message: err.message})
     }
   }
 }
 
-app.get('/forecast', route(async (req, res) => {
-  let {lon, lat, units} = req.query
-  let info = {coordinates: [lon, lat]}
-  let forecast = await getForecast(info.coordinates, {units})
+app.get(
+  '/forecast',
+  route(async (req, res) => {
+    let {lon, lat, units} = req.query
+    let info = {coordinates: [lon, lat]}
+    let forecast = await getForecast(info.coordinates, {units})
 
-  return {
-    info,
-    forecast
-  }
-}))
+    return {
+      info,
+      forecast
+    }
+  })
+)
 
 app.listen(config.port, () => {
   console.log(`info: Lekaro listening on port ${config.port}`)

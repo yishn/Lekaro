@@ -25,7 +25,11 @@ export default class StateContainer extends Component {
           error: true
         })
       } else {
-        let coordinates = hash.slice(1).split(',').slice(0, 2).reverse()
+        let coordinates = hash
+          .slice(1)
+          .split(',')
+          .slice(0, 2)
+          .reverse()
         await this.loadForecast({coordinates, ...options})
       }
     } else {
@@ -54,12 +58,17 @@ export default class StateContainer extends Component {
 
     // Determine location
 
-    let locationInfo = name != null ? await geolocation.get(name, {language: 'en-US'})
-      : coordinates != null ? await geolocation.reverse(coordinates, {language: 'en-US'})
-      : null
+    let locationInfo =
+      name != null
+        ? await geolocation.get(name, {language: 'en-US'})
+        : coordinates != null
+        ? await geolocation.reverse(coordinates, {language: 'en-US'})
+        : null
 
-    let historyMethod = replaceHistory ? 'replaceState'
-      : pushHistory ? 'pushState'
+    let historyMethod = replaceHistory
+      ? 'replaceState'
+      : pushHistory
+      ? 'pushState'
       : null
 
     try {
@@ -67,18 +76,24 @@ export default class StateContainer extends Component {
         coordinates = locationInfo.coordinates
       }
 
-      let response = await fetch(`/forecast?${qs({
-        lat: coordinates[1],
-        lon: coordinates[0],
-        units
-      })}`)
+      let response = await fetch(
+        `/forecast?${qs({
+          lat: coordinates[1],
+          lon: coordinates[0],
+          units
+        })}`
+      )
 
       if (!response.ok) throw new Error()
 
       let {info, forecast} = await response.json()
 
       if (historyMethod != null) {
-        history[historyMethod](null, '', `#${info.coordinates.reverse().join(',')}`)
+        history[historyMethod](
+          null,
+          '',
+          `#${info.coordinates.reverse().join(',')}`
+        )
       }
 
       this.setState({
@@ -119,15 +134,16 @@ export default class StateContainer extends Component {
   render() {
     let Component = this.props.component
 
-    return <Component
-      {...this.state}
-
-      ref={x => {
-        if (x != null) {
-          x.actions = this
-          window.App = x
-        }
-      }}
-    />
+    return (
+      <Component
+        {...this.state}
+        ref={x => {
+          if (x != null) {
+            x.actions = this
+            window.App = x
+          }
+        }}
+      />
+    )
   }
 }

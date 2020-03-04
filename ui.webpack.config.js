@@ -19,7 +19,9 @@ module.exports = (env, argv) => ({
           loader: 'babel-loader',
           options: {
             presets: [['@babel/preset-react', {pragma: 'h'}]],
-            plugins: [['@babel/plugin-proposal-class-properties', {loose: true}]]
+            plugins: [
+              ['@babel/plugin-proposal-class-properties', {loose: true}]
+            ]
           }
         }
       },
@@ -28,9 +30,7 @@ module.exports = (env, argv) => ({
         loader: 'react-svg-loader',
         options: {
           svgo: {
-            plugins: [
-              {removeViewBox: false}
-            ]
+            plugins: [{removeViewBox: false}]
           }
         }
       }

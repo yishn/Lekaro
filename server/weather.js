@@ -5,18 +5,24 @@ import config from '../config.js'
 let cache = {}
 
 async function darkSkyRequest(path, options = {}) {
-  let key = JSON.stringify([Math.round(new Date().getTime() / 1000 / 60), path, options])
+  let key = JSON.stringify([
+    Math.round(new Date().getTime() / 1000 / 60),
+    path,
+    options
+  ])
 
   if (cache[key] == null) {
     cache[key] = (async () => {
       console.log('info: Request Dark Sky', path, options)
 
       let response = await fetch(
-        `https://api.darksky.net/forecast/${config.darkSkyApiKey}${path}?${qs(options)}`,
+        `https://api.darksky.net/forecast/${config.darkSkyApiKey}${path}?${qs(
+          options
+        )}`,
         {compress: true}
       )
 
-      if (!response.ok) throw new Error(body.error);
+      if (!response.ok) throw new Error(body.error)
 
       let body = await response.json()
 
@@ -44,17 +50,18 @@ function transformDarkSkyResponse(response) {
   minutely.data = minutely.data.filter(entry => entry.time > currently.time)
   hourly.data = hourly.data.filter(entry => entry.time > currently.time)
 
-  let extract = (keys, obj) => keys.reduce((acc, key) => (acc[key] = obj[key], acc), {})
+  let extract = (keys, obj) =>
+    keys.reduce((acc, key) => ((acc[key] = obj[key]), acc), {})
 
   let precipitation = [
     currently,
     ...minutely.data,
-    ...(
-      minutely.data.length === 0 ? hourly.data
-      : hourly.data.filter(entry => entry.time > minutely.data.slice(-1)[0].time)
-    )
-  ]
-  .map(entry => ({
+    ...(minutely.data.length === 0
+      ? hourly.data
+      : hourly.data.filter(
+          entry => entry.time > minutely.data.slice(-1)[0].time
+        ))
+  ].map(entry => ({
     time: entry.time,
     intensity: entry.precipIntensity,
     intensityError: entry.precipIntensityError,
@@ -68,38 +75,40 @@ function transformDarkSkyResponse(response) {
     timezone: response.timezone,
     alerts,
     precipitation,
-    hourly: [currently, ...hourly.data]
-      .map(entry => extract([
-        'time',
-        'icon',
-        'temperature',
-        'apparentTemperature',
-        'dewPoint',
-        'humidity',
-        'pressure',
-        'windSpeed',
-        'windGust',
-        'windBearing',
-        'cloudCover',
-        'uvIndex',
-        'visibility',
-        'ozone'
-      ], entry)),
+    hourly: [currently, ...hourly.data].map(entry =>
+      extract(
+        [
+          'time',
+          'icon',
+          'temperature',
+          'apparentTemperature',
+          'dewPoint',
+          'humidity',
+          'pressure',
+          'windSpeed',
+          'windGust',
+          'windBearing',
+          'cloudCover',
+          'uvIndex',
+          'visibility',
+          'ozone'
+        ],
+        entry
+      )
+    ),
 
     daily: daily.data
-      .map(entry => extract([
-        'time',
-        'summary',
-        'icon',
-        'sunriseTime',
-        'sunsetTime',
-        'moonPhase'
-      ], entry))
+      .map(entry =>
+        extract(
+          ['time', 'summary', 'icon', 'sunriseTime', 'sunsetTime', 'moonPhase'],
+          entry
+        )
+      )
       .map((entry, i) => {
         if (
-          entry.sunriseTime == null
-          && entry.sunsetTime == null
-          && daily.data[i].uvIndex === 0
+          entry.sunriseTime == null &&
+          entry.sunsetTime == null &&
+          daily.data[i].uvIndex === 0
         ) {
           // Always night, don't supply sunrise/sunset
         } else {
@@ -108,7 +117,8 @@ function transformDarkSkyResponse(response) {
           }
 
           if (entry.sunsetTime == null) {
-            entry.sunsetTime = (entry[i + 1] || {}).time || entry.time + 24 * 60 * 60
+            entry.sunsetTime =
+              (entry[i + 1] || {}).time || entry.time + 24 * 60 * 60
           }
         }
 

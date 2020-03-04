@@ -20,14 +20,14 @@ export default class LocationInfo extends Component {
       prevLoading: props.loading,
       prevCity: props.city,
       prevState: props.state,
-      prevCountry: props.country,
+      prevCountry: props.country
     }
 
     if (
-      props.city !== state.prevCity
-      || props.state !== state.prevState
-      || props.country !== state.prevCountry
-      || !props.loading && state.prevLoading
+      props.city !== state.prevCity ||
+      props.state !== state.prevState ||
+      props.country !== state.prevCountry ||
+      (!props.loading && state.prevLoading)
     ) {
       result = {
         ...result,
@@ -76,47 +76,49 @@ export default class LocationInfo extends Component {
   render() {
     let {inputRef, units, loading, state, country} = this.props
 
-    return <div class={classnames('location-info', {loading})}>
-      <h2>
-        <input
-          ref={inputRef}
+    return (
+      <div class={classnames('location-info', {loading})}>
+        <h2>
+          <input
+            ref={inputRef}
+            disabled={loading}
+            value={this.state.input}
+            placeholder="Location"
+            autofocus={!this.state.input}
+            onInput={this.handleInputInput}
+            onKeyDown={this.handleInputKeyDown}
+            onBlur={this.handleInputBlur}
+          />
+        </h2>
 
-          disabled={loading}
-          value={this.state.input}
-          placeholder="Location"
-          autofocus={!this.state.input}
-
-          onInput={this.handleInputInput}
-          onKeyDown={this.handleInputKeyDown}
-          onBlur={this.handleInputBlur}
-        />
-      </h2>
-
-      <div class="toolbar">
-        <a
-          class="currentlocation"
-          href="#"
-          title="Current Location"
-          onClick={this.handleCurrentLocationClick}
-        >
-          <CurrentLocationIcon viewBox="0 0 24 24"/>
-        </a>
-
-        <h3>{([state, country].filter(x => !!x).join(', ') || 'Unknown')}</h3>
-
-        <div class="options">
+        <div class="toolbar">
           <a
-            class="units"
+            class="currentlocation"
             href="#"
-            title="Change Units"
-            onClick={this.handleUnitsButtonClick}
-          >{
-            units === 'si' ? 'Metric'
-            : units === 'us' ? 'Imperial'
-            : 'Unknown'
-          }</a>
+            title="Current Location"
+            onClick={this.handleCurrentLocationClick}
+          >
+            <CurrentLocationIcon viewBox="0 0 24 24" />
+          </a>
+
+          <h3>{[state, country].filter(x => !!x).join(', ') || 'Unknown'}</h3>
+
+          <div class="options">
+            <a
+              class="units"
+              href="#"
+              title="Change Units"
+              onClick={this.handleUnitsButtonClick}
+            >
+              {units === 'si'
+                ? 'Metric'
+                : units === 'us'
+                ? 'Imperial'
+                : 'Unknown'}
+            </a>
+          </div>
         </div>
       </div>
-    </div>
+    )
   }
 }

@@ -9,7 +9,10 @@ async function nominatimRequest(path, options = {}) {
   console.log('info: Request Nominatim', path, options)
 
   let response = await fetch(
-    `https://nominatim.openstreetmap.org${path}?${qs({...options, format: 'jsonv2'})}`,
+    `https://nominatim.openstreetmap.org${path}?${qs({
+      ...options,
+      format: 'jsonv2'
+    })}`,
     {
       headers: {
         'User-Agent': 'Lekaro',
@@ -37,25 +40,24 @@ function transformNominatimResponse(response) {
     type: response.type,
 
     address: {
-      country: response.address.country
-        || response.address.continent,
-      state: response.address.state
-        || response.address.state_district,
-      city: response.address.city
-        || response.address.town
-        || response.address.village
-        || response.address.county
-        || response.address.city_district
-        || response.address.region
-        || response.address.island
-        || response.address.administrative
+      country: response.address.country || response.address.continent,
+      state: response.address.state || response.address.state_district,
+      city:
+        response.address.city ||
+        response.address.town ||
+        response.address.village ||
+        response.address.county ||
+        response.address.city_district ||
+        response.address.region ||
+        response.address.island ||
+        response.address.administrative
     }
   }
 
   if (
-    result.address.country == null
-    && result.address.state == null
-    && result.address.city == null
+    result.address.country == null &&
+    result.address.state == null &&
+    result.address.city == null
   ) {
     result.address.city = 'Middle of Nowhere'
   }

@@ -1,5 +1,5 @@
 export const unitsData = {
-  'si': {
+  si: {
     precipitation: {
       intensity: 'mm/h',
       accumulation: 'cm'
@@ -13,7 +13,7 @@ export const unitsData = {
     pressure: 'hPa',
     visibility: 'km'
   },
-  'us': {
+  us: {
     precipitation: {
       intensity: 'iph',
       accumulation: 'in'
