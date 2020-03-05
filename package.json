@@ -4,8 +4,8 @@
   "description": "A modern UI for displaying Dark Sky weather forecasts",
   "module": "./server/main.js",
   "scripts": {
-    "format": "prettier \"**/*.{js,md,html}\" --write",
-    "format-watch": "onchange \"**/*.{js,md,html}\" -- prettier {{changed}} --write",
+    "format": "prettier \"**/*.{js,md,html}\" \"!static/bundle.js\" --write",
+    "format-watch": "onchange \"**/*.{js,md,html}\" \"!static/bundle.js\" -- prettier {{changed}} --write",
     "build-ui": "webpack --config ./ui.webpack.config.js --mode production --progress",
     "watch-ui": "webpack --config ./ui.webpack.config.js --mode development --progress --watch",
     "build-server": "webpack --config ./server.webpack.config.js --mode production --progress",
