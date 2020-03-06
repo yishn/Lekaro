@@ -226,8 +226,11 @@ export default function App({
 
   useEffect(
     function updateDarkStyle() {
-      let dark =
-        nightColumns && nightColumns.length > 0 && nightColumns[0].start <= 0
+      let dark = nightColumns
+        ? nightColumns.length > 0 && nightColumns[0].start <= 0
+        : localStorage.getItem('lekaro.dark') === 'true'
+
+      localStorage.setItem('lekaro.dark', `${!!dark}`)
 
       if (dark != null) {
         if (dark) {
